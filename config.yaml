@@ -1,0 +1,77 @@
+ga:
+  encoding: permutation
+  population_size: 100
+  generations: 500
+  genome_length: 0
+  permutation_size: 0
+
+  selection:
+    type: tournament
+    tournament_size: 3
+    elite_count: 2
+
+  crossover:
+    type: ox
+    rate: 0.8
+    sbx_eta: 20
+
+  mutation:
+    type: swap
+    rate: 0.02
+    gaussian_std: 0.1
+
+  adaptive:
+    enabled: false
+    base_crossover_rate: 0.8
+    base_mutation_rate: 0.02
+    min_crossover_rate: 0.3
+    max_crossover_rate: 0.95
+    min_mutation_rate: 0.001
+    max_mutation_rate: 0.5
+    variance_threshold: 0.01
+    sensitivity: 1.0
+
+  local_search:
+    enabled: false
+    type: "2-opt"
+    interval: 50
+    top_k: 10
+    use_kdtree: true
+    kdtree_neighbors: 20
+    kdtree_threshold: 200
+
+  island:
+    enabled: false
+    num_islands: 4
+    migration:
+      interval: 20
+      num_migrants: 3
+      topology: ring
+    island_configs: []
+
+  nsga2:
+    enabled: false
+    num_objectives: 2
+
+  tsp:
+    data_format: coordinates
+    input_file: data/cities.txt
+    optimal_file: ""
+
+  output:
+    csv_file: convergence.csv
+    svg_file: tsp_solution.svg
+    result_file: result.txt
+    verbose: false
+
+grid_search:
+  population_sizes: [50, 100, 200]
+  generations: [200, 500]
+  crossover_rates: [0.6, 0.8, 0.9]
+  mutation_rates: [0.01, 0.02, 0.05]
+  output_file: grid_search_results.csv
+
+benchmark:
+  instances: []
+  runs: 5
+  output_file: benchmark_results.csv
