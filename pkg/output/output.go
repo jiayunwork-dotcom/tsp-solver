@@ -188,9 +188,9 @@ func GenerateTSPTWVisualization(problem *tsptw.TSPTWProblem, tour []int, eval *t
 		}
 	}
 
-	margin := 50.0
-	width := 800.0
-	height := 600.0
+	margin := 60.0
+	width := 900.0
+	height := 700.0
 	plotWidth := width - 2*margin
 	plotHeight := height - 2*margin
 
@@ -218,9 +218,11 @@ func GenerateTSPTWVisualization(problem *tsptw.TSPTWProblem, tour []int, eval *t
     .city-ok { fill: #27ae60; stroke: #1e8449; stroke-width: 1.5; }
     .city-violated { fill: #e74c3c; stroke: #c0392b; stroke-width: 2; }
     .path { stroke: #3498db; stroke-width: 2; fill: none; opacity: 0.8; }
-    .path-violated { stroke: #e74c3c; stroke-width: 2; fill: none; opacity: 0.6; stroke-dasharray: 5,3; }
+    .path-return { stroke: #9b59b6; stroke-width: 2; fill: none; opacity: 0.8; stroke-dasharray: 5,3; }
+    .path-return-violated { stroke: #e74c3c; stroke-width: 2.5; fill: none; opacity: 0.9; stroke-dasharray: 5,3; }
     .label { font-family: Arial, sans-serif; font-size: 10px; fill: #333; }
-    .tw-label { font-family: Arial, sans-serif; font-size: 8px; fill: #666; }
+    .tw-label { font-family: Arial, sans-serif; font-size: 6px; fill: #888; }
+    .travel-label { font-family: Arial, sans-serif; font-size: 8px; fill: #5dade2; }
     .title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2c3e50; }
     .info { font-family: Arial, sans-serif; font-size: 12px; fill: #7f8c8d; }
     .legend-text { font-family: Arial, sans-serif; font-size: 10px; fill: #333; }
@@ -232,14 +234,20 @@ func GenerateTSPTWVisualization(problem *tsptw.TSPTWProblem, tour []int, eval *t
 		width/2, problem.Name,
 		width/2, problem.NumCities, eval.TotalDistance, eval.TotalWaitTime, eval.TotalViolation)
 
-	svgContent += `  <circle cx="30" cy="570" r="6" class="depot"/>` + "\n"
-	svgContent += `  <text x="42" y="574" class="legend-text">Depot</text>` + "\n"
-	svgContent += `  <circle cx="100" cy="570" r="5" class="city-ok"/>` + "\n"
-	svgContent += `  <text x="112" y="574" class="legend-text">On time</text>` + "\n"
-	svgContent += `  <circle cx="175" cy="570" r="5" class="city-violated"/>` + "\n"
-	svgContent += `  <text x="187" y="574" class="legend-text">Violated</text>` + "\n"
+	svgContent += `  <circle cx="30" cy="640" r="6" class="depot"/>` + "\n"
+	svgContent += `  <text x="42" y="644" class="legend-text">Depot</text>` + "\n"
+	svgContent += `  <circle cx="100" cy="640" r="5" class="city-ok"/>` + "\n"
+	svgContent += `  <text x="112" y="644" class="legend-text">On time</text>` + "\n"
+	svgContent += `  <circle cx="185" cy="640" r="5" class="city-violated"/>` + "\n"
+	svgContent += `  <text x="197" y="644" class="legend-text">Violated</text>` + "\n"
+	svgContent += `  <line x1="270" y1="640" x2="295" y2="640" class="path"/>` + "\n"
+	svgContent += `  <text x="302" y="644" class="legend-text">Travel path</text>` + "\n"
+	svgContent += `  <line x1="395" y1="640" x2="420" y2="640" class="path-return"/>` + "\n"
+	svgContent += `  <text x="427" y="644" class="legend-text">Return to depot</text>` + "\n"
 
+	n := len(tour)
 	pathData := ""
+	travelLabels := ""
 	for i, cityIdx := range tour {
 		city := problem.Cities[cityIdx]
 		x := offsetX + (city.X-minX)*scale
@@ -249,13 +257,67 @@ func GenerateTSPTWVisualization(problem *tsptw.TSPTWProblem, tour []int, eval *t
 		} else {
 			pathData += fmt.Sprintf(" L %.2f %.2f", x, y)
 		}
+
+		nextIdx := tour[(i+1)%n]
+		if i < n-1 {
+			nextCity := problem.Cities[nextIdx]
+			nx := offsetX + (nextCity.X-minX)*scale
+			ny := offsetY + (maxY-nextCity.Y)*scale
+
+			midX := (x + nx) / 2
+			midY := (y + ny) / 2
+
+			travelTime := problem.TravelTime(cityIdx, nextIdx)
+
+			dx := nx - x
+			dy := ny - y
+			perpX := -dy
+			perpY := dx
+			perpLen := 1.0
+			if perpX*perpX+perpY*perpY > 1e-10 {
+				perpLen = 6.0 / math.Sqrt(perpX*perpX + perpY*perpY)
+			}
+			labelX := midX + perpX*perpLen
+			labelY := midY + perpY*perpLen
+
+			travelLabels += fmt.Sprintf(`  <text x="%.2f" y="%.2f" text-anchor="middle" class="travel-label">%.1f</text>`+"\n",
+				labelX, labelY, travelTime)
+		}
 	}
+
+	lastCity := problem.Cities[tour[n-1]]
+	lastX := offsetX + (lastCity.X-minX)*scale
+	lastY := offsetY + (maxY-lastCity.Y)*scale
 	firstCity := problem.Cities[tour[0]]
 	firstX := offsetX + (firstCity.X-minX)*scale
 	firstY := offsetY + (maxY-firstCity.Y)*scale
-	pathData += fmt.Sprintf(" L %.2f %.2f Z", firstX, firstY)
+
+	returnTravelTime := problem.TravelTime(tour[n-1], tour[0])
+	returnMidX := (lastX + firstX) / 2
+	returnMidY := (lastY + firstY) / 2
+
+	dx := firstX - lastX
+	dy := firstY - lastY
+	perpX := -dy
+	perpY := dx
+	perpLen := 1.0
+	if perpX*perpX+perpY*perpY > 1e-10 {
+		perpLen = 6.0 / math.Sqrt(perpX*perpX + perpY*perpY)
+	}
+	returnLabelX := returnMidX + perpX*perpLen
+	returnLabelY := returnMidY + perpY*perpLen
+
+	returnClass := "path-return"
+	if eval.ReturnViolation > 1e-10 {
+		returnClass = "path-return-violated"
+	}
 
 	svgContent += fmt.Sprintf(`  <path d="%s" class="path"/>`+"\n", pathData)
+	svgContent += fmt.Sprintf(`  <line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f" class="%s"/>`+"\n",
+		lastX, lastY, firstX, firstY, returnClass)
+	svgContent += travelLabels
+	svgContent += fmt.Sprintf(`  <text x="%.2f" y="%.2f" text-anchor="middle" class="travel-label">%.1f</text>`+"\n",
+		returnLabelX, returnLabelY, returnTravelTime)
 
 	for i, cityIdx := range tour {
 		city := problem.Cities[cityIdx]
@@ -277,9 +339,15 @@ func GenerateTSPTWVisualization(problem *tsptw.TSPTWProblem, tour []int, eval *t
 		svgContent += fmt.Sprintf(`  <circle cx="%.2f" cy="%.2f" r="%.1f" class="%s"/>`+"\n", x, y, r, class)
 		svgContent += fmt.Sprintf(`  <text x="%.2f" y="%.2f" text-anchor="middle" class="label">%d</text>`+"\n",
 			x, y-12, cityIdx)
-		twText := fmt.Sprintf("[%.0f,%.0f]", city.Earliest, city.Latest)
+
+		var twText string
+		if cityIdx == 0 {
+			twText = fmt.Sprintf("Depot [0,%.0f]", city.Latest)
+		} else {
+			twText = fmt.Sprintf("[%.0f,%.0f]", city.Earliest, city.Latest)
+		}
 		svgContent += fmt.Sprintf(`  <text x="%.2f" y="%.2f" text-anchor="middle" class="tw-label">%s</text>`+"\n",
-			x, y+14, twText)
+			x, y+16, twText)
 	}
 
 	svgContent += "</svg>\n"

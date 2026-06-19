@@ -38,13 +38,15 @@ type VisitInfo struct {
 }
 
 type TourEvaluation struct {
-	TotalDistance    float64
-	TotalTravelTime  float64
-	TotalWaitTime    float64
-	TotalViolation   float64
-	Visits           []VisitInfo
-	IsFeasible       bool
-	PenalizedCost    float64
+	TotalDistance      float64
+	TotalTravelTime    float64
+	TotalWaitTime      float64
+	TotalViolation     float64
+	ReturnViolation    float64
+	ReturnArrivalTime  float64
+	Visits             []VisitInfo
+	IsFeasible         bool
+	PenalizedCost      float64
 }
 
 func LoadTSPTWProblem(filePath string, speed float64) (*TSPTWProblem, error) {
@@ -197,12 +199,23 @@ func (p *TSPTWProblem) EvaluateTour(tour []int) *TourEvaluation {
 	lastCity := orderedTour[len(orderedTour)-1]
 	firstCity := orderedTour[0]
 	returnDist := p.Distance(lastCity, firstCity)
+	returnTravelTime := p.TravelTime(lastCity, firstCity)
 	totalDistance += returnDist
+
+	depot := p.Cities[firstCity]
+	returnArrivalTime := currentTime + returnTravelTime
+	returnViolation := 0.0
+	if returnArrivalTime > depot.Latest {
+		returnViolation = returnArrivalTime - depot.Latest
+	}
+	totalViolation += returnViolation
 
 	eval.TotalDistance = totalDistance
 	eval.TotalTravelTime = totalDistance / p.Speed
 	eval.TotalWaitTime = totalWait
 	eval.TotalViolation = totalViolation
+	eval.ReturnViolation = returnViolation
+	eval.ReturnArrivalTime = returnArrivalTime
 	eval.IsFeasible = totalViolation < 1e-10
 
 	return eval
@@ -476,6 +489,10 @@ func copyTour(tour []int) []int {
 	t := make([]int, len(tour))
 	copy(t, tour)
 	return t
+}
+
+func RandomTour(n int) []int {
+	return randomTour(n)
 }
 
 func randomTour(n int) []int {

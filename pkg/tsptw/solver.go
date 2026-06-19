@@ -10,14 +10,21 @@ import (
 )
 
 type TSPTWSolver struct {
-	Problem    *TSPTWProblem
-	Config     *config.TSPTWConfig
-	Penalty    *PenaltyController
-	Population [][]int
-	Fitnesses  []float64
-	Gen        int
-	BestTour   []int
-	BestCost   float64
+	Problem       *TSPTWProblem
+	Config        *config.TSPTWConfig
+	Penalty       *PenaltyController
+	Population    [][]int
+	Fitnesses     []float64
+	Gen           int
+	BestTour      []int
+	BestCost      float64
+	Convergence   []ConvergencePoint
+}
+
+type ConvergencePoint struct {
+	Generation     int
+	BestCost       float64
+	FeasibleRatio  float64
 }
 
 type TSPTWResult struct {
@@ -28,6 +35,7 @@ type TSPTWResult struct {
 	Generations    int
 	FeasibleRatio  float64
 	FinalPenalty   float64
+	Convergence    []ConvergencePoint
 }
 
 func NewTSPTWSolver(problem *TSPTWProblem, cfg *config.TSPTWConfig) *TSPTWSolver {
@@ -49,9 +57,13 @@ func (s *TSPTWSolver) Solve() *TSPTWResult {
 	s.initPopulation()
 
 	totalGens := s.Config.Generations
+	s.Convergence = make([]ConvergencePoint, 0, totalGens+1)
+
+	s.recordConvergence()
 
 	for s.Gen < totalGens {
 		s.step()
+		s.recordConvergence()
 
 		if s.Config.PenaltyType == "adaptive" && s.Gen > 0 &&
 			s.Gen%s.Penalty.PenaltyAdjustInterval == 0 {
@@ -106,6 +118,7 @@ func (s *TSPTWSolver) Solve() *TSPTWResult {
 		Generations:   totalGens,
 		FeasibleRatio: feasibleRatio,
 		FinalPenalty:  s.Penalty.GetCoefficient(),
+		Convergence:   s.Convergence,
 	}
 }
 
@@ -228,4 +241,13 @@ func (s *TSPTWSolver) recomputeAllFitness() {
 		s.Fitnesses[i] = s.Problem.ComputePenalizedFitness(tour, s.Penalty.GetCoefficient())
 	}
 	s.updateBest()
+}
+
+func (s *TSPTWSolver) recordConvergence() {
+	feasibleRatio := ComputeFeasibleRatio(s.Problem, s.Population)
+	s.Convergence = append(s.Convergence, ConvergencePoint{
+		Generation:    s.Gen,
+		BestCost:      s.BestCost,
+		FeasibleRatio: feasibleRatio,
+	})
 }

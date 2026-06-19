@@ -1,55 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700">
   <style>
     .depot { fill: #2980b9; stroke: #1a5276; stroke-width: 2; }
     .city-ok { fill: #27ae60; stroke: #1e8449; stroke-width: 1.5; }
     .city-violated { fill: #e74c3c; stroke: #c0392b; stroke-width: 2; }
     .path { stroke: #3498db; stroke-width: 2; fill: none; opacity: 0.8; }
-    .path-violated { stroke: #e74c3c; stroke-width: 2; fill: none; opacity: 0.6; stroke-dasharray: 5,3; }
+    .path-return { stroke: #9b59b6; stroke-width: 2; fill: none; opacity: 0.8; stroke-dasharray: 5,3; }
+    .path-return-violated { stroke: #e74c3c; stroke-width: 2.5; fill: none; opacity: 0.9; stroke-dasharray: 5,3; }
     .label { font-family: Arial, sans-serif; font-size: 10px; fill: #333; }
-    .tw-label { font-family: Arial, sans-serif; font-size: 8px; fill: #666; }
+    .tw-label { font-family: Arial, sans-serif; font-size: 6px; fill: #888; }
+    .travel-label { font-family: Arial, sans-serif; font-size: 8px; fill: #5dade2; }
     .title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2c3e50; }
     .info { font-family: Arial, sans-serif; font-size: 12px; fill: #7f8c8d; }
     .legend-text { font-family: Arial, sans-serif; font-size: 10px; fill: #333; }
   </style>
 
-  <text x="400" y="30" text-anchor="middle" class="title">TSPTW Path: data/tsptw_10cities.txt</text>
-  <text x="400" y="50" text-anchor="middle" class="info">Cities: 10 | Distance: 44.94 | Wait: 30.87 | Violation: 0.00</text>
-  <circle cx="30" cy="570" r="6" class="depot"/>
-  <text x="42" y="574" class="legend-text">Depot</text>
-  <circle cx="100" cy="570" r="5" class="city-ok"/>
-  <text x="112" y="574" class="legend-text">On time</text>
-  <circle cx="175" cy="570" r="5" class="city-violated"/>
-  <text x="187" y="574" class="legend-text">Violated</text>
-  <path d="M 118.75 550.00 L 431.25 487.50 L 243.75 362.50 L 556.25 300.00 L 493.75 425.00 L 181.25 237.50 L 368.75 112.50 L 306.25 50.00 L 618.75 50.00 L 681.25 175.00 L 118.75 550.00 Z" class="path"/>
-  <circle cx="118.75" cy="550.00" r="7.0" class="depot"/>
-  <text x="118.75" y="538.00" text-anchor="middle" class="label">0</text>
-  <text x="118.75" y="564.00" text-anchor="middle" class="tw-label">[0,1000]</text>
-  <circle cx="431.25" cy="487.50" r="5.0" class="city-ok"/>
-  <text x="431.25" y="475.50" text-anchor="middle" class="label">2</text>
-  <text x="431.25" y="501.50" text-anchor="middle" class="tw-label">[30,80]</text>
-  <circle cx="243.75" cy="362.50" r="5.0" class="city-ok"/>
-  <text x="243.75" y="350.50" text-anchor="middle" class="label">1</text>
-  <text x="243.75" y="376.50" text-anchor="middle" class="tw-label">[10,50]</text>
-  <circle cx="556.25" cy="300.00" r="5.0" class="city-ok"/>
-  <text x="556.25" y="288.00" text-anchor="middle" class="label">3</text>
-  <text x="556.25" y="314.00" text-anchor="middle" class="tw-label">[50,120]</text>
-  <circle cx="493.75" cy="425.00" r="5.0" class="city-ok"/>
-  <text x="493.75" y="413.00" text-anchor="middle" class="label">7</text>
-  <text x="493.75" y="439.00" text-anchor="middle" class="tw-label">[60,140]</text>
-  <circle cx="181.25" cy="237.50" r="5.0" class="city-ok"/>
-  <text x="181.25" y="225.50" text-anchor="middle" class="label">5</text>
-  <text x="181.25" y="251.50" text-anchor="middle" class="tw-label">[40,100]</text>
-  <circle cx="368.75" cy="112.50" r="5.0" class="city-ok"/>
-  <text x="368.75" y="100.50" text-anchor="middle" class="label">4</text>
-  <text x="368.75" y="126.50" text-anchor="middle" class="tw-label">[80,160]</text>
-  <circle cx="306.25" cy="50.00" r="5.0" class="city-ok"/>
-  <text x="306.25" y="38.00" text-anchor="middle" class="label">8</text>
-  <text x="306.25" y="64.00" text-anchor="middle" class="tw-label">[90,180]</text>
-  <circle cx="618.75" cy="50.00" r="5.0" class="city-ok"/>
-  <text x="618.75" y="38.00" text-anchor="middle" class="label">6</text>
-  <text x="618.75" y="64.00" text-anchor="middle" class="tw-label">[100,200]</text>
-  <circle cx="681.25" cy="175.00" r="5.0" class="city-ok"/>
-  <text x="681.25" y="163.00" text-anchor="middle" class="label">9</text>
-  <text x="681.25" y="189.00" text-anchor="middle" class="tw-label">[120,250]</text>
+  <text x="450" y="30" text-anchor="middle" class="title">TSPTW Path: /tmp/tsptw_tight_depot.txt</text>
+  <text x="450" y="50" text-anchor="middle" class="info">Cities: 5 | Distance: 26.46 | Wait: 42.61 | Violation: 0.00</text>
+  <circle cx="30" cy="640" r="6" class="depot"/>
+  <text x="42" y="644" class="legend-text">Depot</text>
+  <circle cx="100" cy="640" r="5" class="city-ok"/>
+  <text x="112" y="644" class="legend-text">On time</text>
+  <circle cx="185" cy="640" r="5" class="city-violated"/>
+  <text x="197" y="644" class="legend-text">Violated</text>
+  <line x1="270" y1="640" x2="295" y2="640" class="path"/>
+  <text x="302" y="644" class="legend-text">Travel path</text>
+  <line x1="395" y1="640" x2="420" y2="640" class="path-return"/>
+  <text x="427" y="644" class="legend-text">Return to depot</text>
+  <path d="M 160.00 640.00 L 325.71 391.43 L 740.00 308.57 L 574.29 557.14 L 491.43 60.00" class="path"/>
+  <line x1="491.43" y1="60.00" x2="160.00" y2="640.00" class="path-return"/>
+  <text x="247.85" y="519.04" text-anchor="middle" class="travel-label">3.6</text>
+  <text x="534.03" y="355.88" text-anchor="middle" class="travel-label">5.1</text>
+  <text x="652.15" y="429.53" text-anchor="middle" class="travel-label">3.6</text>
+  <text x="538.78" y="307.59" text-anchor="middle" class="travel-label">6.1</text>
+  <text x="320.50" y="347.02" text-anchor="middle" class="travel-label">8.1</text>
+  <circle cx="160.00" cy="640.00" r="7.0" class="depot"/>
+  <text x="160.00" y="628.00" text-anchor="middle" class="label">0</text>
+  <text x="160.00" y="656.00" text-anchor="middle" class="tw-label">Depot [0,100]</text>
+  <circle cx="325.71" cy="391.43" r="5.0" class="city-ok"/>
+  <text x="325.71" y="379.43" text-anchor="middle" class="label">1</text>
+  <text x="325.71" y="407.43" text-anchor="middle" class="tw-label">[10,50]</text>
+  <circle cx="740.00" cy="308.57" r="5.0" class="city-ok"/>
+  <text x="740.00" y="296.57" text-anchor="middle" class="label">3</text>
+  <text x="740.00" y="324.57" text-anchor="middle" class="tw-label">[50,120]</text>
+  <circle cx="574.29" cy="557.14" r="5.0" class="city-ok"/>
+  <text x="574.29" y="545.14" text-anchor="middle" class="label">2</text>
+  <text x="574.29" y="573.14" text-anchor="middle" class="tw-label">[30,80]</text>
+  <circle cx="491.43" cy="60.00" r="5.0" class="city-ok"/>
+  <text x="491.43" y="48.00" text-anchor="middle" class="label">4</text>
+  <text x="491.43" y="76.00" text-anchor="middle" class="tw-label">[80,160]</text>
 </svg>

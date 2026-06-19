@@ -1,0 +1,1115 @@
+{
+  "tour": [
+    0,
+    5,
+    1,
+    2,
+    7,
+    3,
+    4,
+    8,
+    6,
+    9
+  ],
+  "schedule": [
+    {
+      "city_id": 0,
+      "arrive": 0,
+      "wait": 0,
+      "start": 0,
+      "leave": 0,
+      "violation": 0
+    },
+    {
+      "city_id": 5,
+      "arrive": 5.0990195135927845,
+      "wait": 34.900980486407214,
+      "start": 40,
+      "leave": 45,
+      "violation": 0
+    },
+    {
+      "city_id": 1,
+      "arrive": 47.236067977499786,
+      "wait": 0,
+      "start": 47.236067977499786,
+      "leave": 52.236067977499786,
+      "violation": 0
+    },
+    {
+      "city_id": 2,
+      "arrive": 55.841619252963774,
+      "wait": 0,
+      "start": 55.841619252963774,
+      "leave": 63.841619252963774,
+      "violation": 0
+    },
+    {
+      "city_id": 7,
+      "arrive": 65.25583281533687,
+      "wait": 0,
+      "start": 65.25583281533687,
+      "leave": 71.25583281533687,
+      "violation": 0
+    },
+    {
+      "city_id": 3,
+      "arrive": 73.49190079283666,
+      "wait": 0,
+      "start": 73.49190079283666,
+      "leave": 79.49190079283666,
+      "violation": 0
+    },
+    {
+      "city_id": 4,
+      "arrive": 83.73454147995595,
+      "wait": 0,
+      "start": 83.73454147995595,
+      "leave": 93.73454147995595,
+      "violation": 0
+    },
+    {
+      "city_id": 8,
+      "arrive": 95.14875504232904,
+      "wait": 0,
+      "start": 95.14875504232904,
+      "leave": 102.14875504232904,
+      "violation": 0
+    },
+    {
+      "city_id": 6,
+      "arrive": 107.14875504232904,
+      "wait": 0,
+      "start": 107.14875504232904,
+      "leave": 115.14875504232904,
+      "violation": 0
+    },
+    {
+      "city_id": 9,
+      "arrive": 117.38482301982883,
+      "wait": 2.615176980171171,
+      "start": 120,
+      "leave": 125,
+      "violation": 0
+    }
+  ],
+  "return_depot": {
+    "arrive": 135.81665382639196,
+    "violation": 0
+  },
+  "summary": {
+    "distance": 38.300496359813586,
+    "wait": 37.516157466578385,
+    "violation": 0,
+    "feasible": true,
+    "duration_ms": 89,
+    "generations": 200
+  },
+  "convergence": [
+    {
+      "generation": 0,
+      "best_cost": 2487.607619002263,
+      "feasible_ratio": 0
+    },
+    {
+      "generation": 1,
+      "best_cost": 2318.452958408945,
+      "feasible_ratio": 0
+    },
+    {
+      "generation": 2,
+      "best_cost": 89.85092927419998,
+      "feasible_ratio": 0.02
+    },
+    {
+      "generation": 3,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.09
+    },
+    {
+      "generation": 4,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.23
+    },
+    {
+      "generation": 5,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.54
+    },
+    {
+      "generation": 6,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.89
+    },
+    {
+      "generation": 7,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 8,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 9,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 10,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 11,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 12,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 13,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 14,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 15,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 16,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 17,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 18,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 19,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 20,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 21,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 22,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 23,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 24,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 25,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 26,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 27,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 28,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 29,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 30,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 31,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 32,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 33,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 34,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 35,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 36,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 37,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 38,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.96
+    },
+    {
+      "generation": 39,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 40,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 41,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 42,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 43,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 44,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 45,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 46,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 47,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 48,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 49,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 50,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 51,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 52,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 53,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 54,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 55,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 56,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 57,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 58,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.95
+    },
+    {
+      "generation": 59,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 60,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 61,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 62,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 63,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 64,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 65,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 66,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 67,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 68,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 69,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 70,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 71,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.95
+    },
+    {
+      "generation": 72,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 73,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 74,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 75,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 76,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 77,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 78,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 79,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 80,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.96
+    },
+    {
+      "generation": 81,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 82,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 83,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 84,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 85,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 86,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 87,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 88,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.96
+    },
+    {
+      "generation": 89,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 90,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 91,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 92,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 93,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 94,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 95,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 96,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 97,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 98,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 99,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 100,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 101,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 102,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 103,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 104,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.95
+    },
+    {
+      "generation": 105,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.96
+    },
+    {
+      "generation": 106,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 107,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 108,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 109,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 110,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 111,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 112,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 113,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 114,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 115,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 116,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 117,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 118,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 119,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 120,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 121,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 122,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 123,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 124,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 125,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 126,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 127,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 128,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 129,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 130,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 131,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 132,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 133,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 134,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 135,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 136,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 137,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 138,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 139,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 140,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 141,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 142,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 143,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 144,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 145,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 146,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 147,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 148,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.96
+    },
+    {
+      "generation": 149,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 150,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 151,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 152,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 153,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 154,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 155,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 156,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 157,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 158,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 159,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 160,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 161,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 162,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 163,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 164,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 165,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 166,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 167,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 168,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 169,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 170,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 171,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 172,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 173,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 174,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 175,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 176,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 177,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 178,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 179,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 180,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 181,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 182,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 183,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 184,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 185,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 186,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 187,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 188,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.97
+    },
+    {
+      "generation": 189,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 190,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 191,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 192,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 193,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 194,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 195,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 196,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 197,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    },
+    {
+      "generation": 198,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.98
+    },
+    {
+      "generation": 199,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 1
+    },
+    {
+      "generation": 200,
+      "best_cost": 75.81665382639197,
+      "feasible_ratio": 0.99
+    }
+  ]
+}

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -421,6 +423,8 @@ func runTSPTW(args []string) {
 	outputResult := fs.String("result", "", "Output result file (overrides config)")
 	seed := fs.Int64("seed", 0, "Random seed")
 	verbose := fs.Bool("verbose", false, "Verbose output")
+	compareRandom := fs.Int("compare-random", 0, "Compare with N random tours")
+	exportJSON := fs.String("export-json", "", "Export results to JSON file")
 
 	population := fs.Int("population", 0, "Population size (overrides config)")
 	generations := fs.Int("generations", 0, "Number of generations (overrides config)")
@@ -511,20 +515,32 @@ func runTSPTW(args []string) {
 
 	fmt.Println()
 	fmt.Println("=== Time Schedule ===")
-	fmt.Printf("%-6s %-8s %-8s %-8s %-8s %-10s %-10s\n",
+	fmt.Printf("%-18s %-8s %-8s %-8s %-8s %-10s %-10s\n",
 		"City", "Arrive", "Wait", "Start", "Leave", "TW", "Violation")
-	fmt.Println(strings.Repeat("-", 70))
+	fmt.Println(strings.Repeat("-", 80))
 	for _, v := range eval.Visits {
 		city := problem.Cities[v.CityID]
 		violStr := ""
 		if v.Violation > 1e-10 {
 			violStr = fmt.Sprintf("*** %.2f", v.Violation)
 		}
-		fmt.Printf("%-6d %-8.2f %-8.2f %-8.2f %-8.2f [%-.0f,%-.0f]  %-10s\n",
-			v.CityID, v.ArrivalTime, v.WaitTime, v.ServiceStart, v.ServiceEnd,
+		cityLabel := fmt.Sprintf("%d", v.CityID)
+		if v.CityID == 0 {
+			cityLabel = "0 (Depot)"
+		}
+		fmt.Printf("%-18s %-8.2f %-8.2f %-8.2f %-8.2f [%-.0f,%-.0f]  %-10s\n",
+			cityLabel, v.ArrivalTime, v.WaitTime, v.ServiceStart, v.ServiceEnd,
 			city.Earliest, city.Latest, violStr)
 	}
-	fmt.Println(strings.Repeat("-", 70))
+	returnViolStr := ""
+	if eval.ReturnViolation > 1e-10 {
+		returnViolStr = fmt.Sprintf("*** %.2f", eval.ReturnViolation)
+	}
+	depotLatest := problem.Cities[0].Latest
+	fmt.Printf("%-18s %-8.2f %-8s %-8s %-8s [%-.0f,%-.0f]  %-10s\n",
+		"Return to depot", eval.ReturnArrivalTime, "-", "-", "-",
+		0.0, depotLatest, returnViolStr)
+	fmt.Println(strings.Repeat("-", 80))
 	fmt.Printf("Total wait: %.2f, Total violation: %.2f\n", eval.TotalWaitTime, eval.TotalViolation)
 
 	if !eval.IsFeasible {
@@ -535,6 +551,10 @@ func runTSPTW(args []string) {
 				fmt.Printf("  City %d: arrived at %.2f, latest = %.0f, VIOLATED by %.2f minutes\n",
 					v.CityID, v.ServiceStart, problem.Cities[v.CityID].Latest, v.Violation)
 			}
+		}
+		if eval.ReturnViolation > 1e-10 {
+			fmt.Printf("  Return to depot: arrived at %.2f, latest = %.0f, VIOLATED by %.2f minutes\n",
+				eval.ReturnArrivalTime, problem.Cities[0].Latest, eval.ReturnViolation)
 		}
 	}
 
@@ -560,12 +580,193 @@ func runTSPTW(args []string) {
 			sb.WriteString(fmt.Sprintf("City %d: arrive=%.2f wait=%.2f start=%.2f leave=%.2f TW=[%.0f,%.0f]%s\n",
 				v.CityID, v.ArrivalTime, v.WaitTime, v.ServiceStart, v.ServiceEnd, city.Earliest, city.Latest, violStr))
 		}
+		returnViolStr := ""
+		if eval.ReturnViolation > 1e-10 {
+			returnViolStr = fmt.Sprintf(" VIOLATED(%.2f)", eval.ReturnViolation)
+		}
+		sb.WriteString(fmt.Sprintf("Return to depot: arrive=%.2f TW=[%.0f,%.0f]%s\n",
+			eval.ReturnArrivalTime, 0.0, problem.Cities[0].Latest, returnViolStr))
 		if err := os.WriteFile(cfg.TSPTW.OutputResult, []byte(sb.String()), 0644); err != nil {
 			fmt.Fprintf(os.Stderr, "Warning: could not write result: %v\n", err)
 		} else {
 			fmt.Printf("Result written to: %s\n", cfg.TSPTW.OutputResult)
 		}
 	}
+
+	if *compareRandom > 0 {
+		fmt.Println()
+		fmt.Println("=== Random Solution Comparison ===")
+		fmt.Printf("Generating %d random tours...\n", *compareRandom)
+
+		bestDist := math.Inf(1)
+		worstDist := 0.0
+		bestWait := 0.0
+		worstWait := 0.0
+		bestViolation := 0.0
+		worstViolation := 0.0
+		totalDist := 0.0
+		totalWait := 0.0
+		totalViolation := 0.0
+		feasibleCount := 0
+		bestFeasible := false
+		worstFeasible := false
+
+		for i := 0; i < *compareRandom; i++ {
+			randomTour := tsptw.RandomTour(problem.NumCities)
+			randomEval := problem.EvaluateTour(randomTour)
+
+			totalDist += randomEval.TotalDistance
+			totalWait += randomEval.TotalWaitTime
+			totalViolation += randomEval.TotalViolation
+
+			if randomEval.IsFeasible {
+				feasibleCount++
+			}
+
+			if randomEval.TotalDistance < bestDist {
+				bestDist = randomEval.TotalDistance
+				bestWait = randomEval.TotalWaitTime
+				bestViolation = randomEval.TotalViolation
+				bestFeasible = randomEval.IsFeasible
+			}
+			if randomEval.TotalDistance > worstDist {
+				worstDist = randomEval.TotalDistance
+				worstWait = randomEval.TotalWaitTime
+				worstViolation = randomEval.TotalViolation
+				worstFeasible = randomEval.IsFeasible
+			}
+		}
+
+		avgDist := totalDist / float64(*compareRandom)
+		avgWait := totalWait / float64(*compareRandom)
+		avgViolation := totalViolation / float64(*compareRandom)
+		avgFeasible := float64(feasibleCount) / float64(*compareRandom)
+
+		fmt.Println()
+		fmt.Println(strings.Repeat("=", 90))
+		fmt.Printf("%-20s %-15s %-15s %-15s %-15s\n",
+			"Method", "Total Distance", "Total Wait", "Total Violation", "Feasible")
+		fmt.Println(strings.Repeat("-", 90))
+		fmt.Printf("%-20s %-15.2f %-15.2f %-15.2f %-15v\n",
+			"GA Best", eval.TotalDistance, eval.TotalWaitTime, eval.TotalViolation, eval.IsFeasible)
+		fmt.Printf("%-20s %-15.2f %-15.2f %-15.2f %-15v\n",
+			"Random Best", bestDist, bestWait, bestViolation, bestFeasible)
+		fmt.Printf("%-20s %-15.2f %-15.2f %-15.2f %-15.2f%%\n",
+			"Random Avg", avgDist, avgWait, avgViolation, avgFeasible*100)
+		fmt.Printf("%-20s %-15.2f %-15.2f %-15.2f %-15v\n",
+			"Random Worst", worstDist, worstWait, worstViolation, worstFeasible)
+		fmt.Println(strings.Repeat("=", 90))
+
+		gapBest := 0.0
+		if bestDist > 1e-10 {
+			gapBest = (eval.TotalDistance - bestDist) / bestDist * 100
+		}
+		gapAvg := 0.0
+		if avgDist > 1e-10 {
+			gapAvg = (avgDist - eval.TotalDistance) / avgDist * 100
+		}
+		fmt.Printf("\nGA vs Random Best:   %+.2f%%\n", gapBest)
+		fmt.Printf("GA vs Random Avg:    %+.2f%% improvement\n", gapAvg)
+		fmt.Printf("Random feasible rate: %.2f%%\n", avgFeasible*100)
+	}
+
+	if *exportJSON != "" {
+		err := exportTSPTWJSON(problem, result, eval, *exportJSON)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: could not export JSON: %v\n", err)
+		} else {
+			fmt.Printf("JSON exported to: %s\n", *exportJSON)
+		}
+	}
+}
+
+type jsonScheduleEntry struct {
+	CityID    int     `json:"city_id"`
+	Arrive    float64 `json:"arrive"`
+	Wait      float64 `json:"wait"`
+	Start     float64 `json:"start"`
+	Leave     float64 `json:"leave"`
+	Violation float64 `json:"violation"`
+}
+
+type jsonReturnDepot struct {
+	Arrive    float64 `json:"arrive"`
+	Violation float64 `json:"violation"`
+}
+
+type jsonSummary struct {
+	Distance   float64 `json:"distance"`
+	Wait       float64 `json:"wait"`
+	Violation  float64 `json:"violation"`
+	Feasible   bool    `json:"feasible"`
+	DurationMs int64   `json:"duration_ms"`
+	Generations int    `json:"generations"`
+}
+
+type jsonConvergencePoint struct {
+	Generation    int     `json:"generation"`
+	BestCost      float64 `json:"best_cost"`
+	FeasibleRatio float64 `json:"feasible_ratio"`
+}
+
+type jsonTSPTWResult struct {
+	Tour        []int                   `json:"tour"`
+	Schedule    []jsonScheduleEntry     `json:"schedule"`
+	ReturnDepot jsonReturnDepot         `json:"return_depot"`
+	Summary     jsonSummary             `json:"summary"`
+	Convergence []jsonConvergencePoint  `json:"convergence"`
+}
+
+func exportTSPTWJSON(problem *tsptw.TSPTWProblem, result *tsptw.TSPTWResult, eval *tsptw.TourEvaluation, filePath string) error {
+	schedule := make([]jsonScheduleEntry, len(eval.Visits))
+	for i, v := range eval.Visits {
+		schedule[i] = jsonScheduleEntry{
+			CityID:    v.CityID,
+			Arrive:    v.ArrivalTime,
+			Wait:      v.WaitTime,
+			Start:     v.ServiceStart,
+			Leave:     v.ServiceEnd,
+			Violation: v.Violation,
+		}
+	}
+
+	conv := make([]jsonConvergencePoint, len(result.Convergence))
+	for i, c := range result.Convergence {
+		conv[i] = jsonConvergencePoint{
+			Generation:    c.Generation,
+			BestCost:      c.BestCost,
+			FeasibleRatio: c.FeasibleRatio,
+		}
+	}
+
+	jsonResult := jsonTSPTWResult{
+		Tour:     result.BestTour,
+		Schedule: schedule,
+		ReturnDepot: jsonReturnDepot{
+			Arrive:    eval.ReturnArrivalTime,
+			Violation: eval.ReturnViolation,
+		},
+		Summary: jsonSummary{
+			Distance:    eval.TotalDistance,
+			Wait:        eval.TotalWaitTime,
+			Violation:   eval.TotalViolation,
+			Feasible:    eval.IsFeasible,
+			DurationMs:  result.Duration.Milliseconds(),
+			Generations: result.Generations,
+		},
+		Convergence: conv,
+	}
+
+	data, err := json.MarshalIndent(jsonResult, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal JSON: %v", err)
+	}
+
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return fmt.Errorf("failed to write JSON file: %v", err)
+	}
+
+	return nil
 }
 
 func applyOverrides(cfg *config.Config, args []string) {
