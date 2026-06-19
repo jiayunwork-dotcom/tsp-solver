@@ -75,3 +75,24 @@ benchmark:
   instances: []
   runs: 5
   output_file: benchmark_results.csv
+
+tsptw:
+  penalty_type: fixed
+  penalty_coefficient: 100.0
+  feasibility_target: 0.5
+  penalty_adjust_interval: 10
+  repair_enabled: true
+  repair_interval: 10
+  repair_top_k: 5
+  speed: 1.0
+  input_file: data/tsptw_10cities.txt
+  output_csv: tsptw_convergence.csv
+  output_svg: tsptw_solution.svg
+  output_result: tsptw_result.txt
+  population_size: 100
+  generations: 500
+  crossover_rate: 0.8
+  mutation_rate: 0.05
+  tournament_size: 3
+  elite_count: 2
+  verbose: false

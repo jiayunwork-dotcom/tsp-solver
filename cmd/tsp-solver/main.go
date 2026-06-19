@@ -11,6 +11,7 @@ import (
 	"github.com/tsp-solver/pkg/config"
 	"github.com/tsp-solver/pkg/output"
 	"github.com/tsp-solver/pkg/tsp"
+	"github.com/tsp-solver/pkg/tsptw"
 	"github.com/tsp-solver/pkg/utils"
 )
 
@@ -31,6 +32,8 @@ func main() {
 		runGridSearch(os.Args[2:])
 	case "visualize":
 		runVisualize(os.Args[2:])
+	case "tsptw":
+		runTSPTW(os.Args[2:])
 	case "help", "--help", "-h":
 		printUsage()
 	default:
@@ -48,6 +51,7 @@ func printUsage() {
 	fmt.Println()
 	fmt.Println("Commands:")
 	fmt.Println("  solve          Solve a TSP problem using genetic algorithm")
+	fmt.Println("  tsptw          Solve a TSP with Time Windows problem")
 	fmt.Println("  benchmark      Run benchmark tests on multiple instances")
 	fmt.Println("  grid-search    Run grid search for parameter optimization")
 	fmt.Println("  visualize      Generate SVG visualization from result file")
@@ -407,6 +411,161 @@ func runVisualize(args []string) {
 	}
 
 	fmt.Printf("Visualization written to: %s\n", *outputFile)
+}
+
+func runTSPTW(args []string) {
+	fs := flag.NewFlagSet("tsptw", flag.ExitOnError)
+	configFile := fs.String("config", "config.yaml", "Path to YAML configuration file")
+	inputFile := fs.String("input", "", "Input TSPTW data file (overrides config)")
+	outputSVG := fs.String("svg", "", "Output SVG file (overrides config)")
+	outputResult := fs.String("result", "", "Output result file (overrides config)")
+	seed := fs.Int64("seed", 0, "Random seed")
+	verbose := fs.Bool("verbose", false, "Verbose output")
+
+	population := fs.Int("population", 0, "Population size (overrides config)")
+	generations := fs.Int("generations", 0, "Number of generations (overrides config)")
+	penaltyType := fs.String("penalty-type", "", "Penalty type: fixed, adaptive (overrides config)")
+	penaltyCoeff := fs.Float64("penalty-coefficient", 0, "Penalty coefficient (overrides config)")
+	speed := fs.Float64("speed", 0, "Travel speed (overrides config)")
+	repairEnabled := fs.Bool("repair", false, "Enable repair operator (overrides config)")
+
+	fs.Parse(args)
+
+	cfg, err := config.LoadConfig(*configFile)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error loading config: %v\n", err)
+		os.Exit(1)
+	}
+
+	if *inputFile != "" {
+		cfg.TSPTW.InputFile = *inputFile
+	}
+	if *outputSVG != "" {
+		cfg.TSPTW.OutputSVG = *outputSVG
+	}
+	if *outputResult != "" {
+		cfg.TSPTW.OutputResult = *outputResult
+	}
+	if *verbose {
+		cfg.TSPTW.Verbose = true
+	}
+	if *seed > 0 {
+		utils.SetSeed(*seed)
+	}
+	if *population > 0 {
+		cfg.TSPTW.PopulationSize = *population
+	}
+	if *generations > 0 {
+		cfg.TSPTW.Generations = *generations
+	}
+	if *penaltyType != "" {
+		cfg.TSPTW.PenaltyType = *penaltyType
+	}
+	if *penaltyCoeff > 0 {
+		cfg.TSPTW.PenaltyCoefficient = *penaltyCoeff
+	}
+	if *speed > 0 {
+		cfg.TSPTW.Speed = *speed
+	}
+	if *repairEnabled {
+		cfg.TSPTW.RepairEnabled = true
+	}
+
+	if cfg.TSPTW.InputFile == "" {
+		fmt.Fprintln(os.Stderr, "Error: no input file specified (use --input or set tsptw.input_file in config)")
+		os.Exit(1)
+	}
+
+	problem, err := tsptw.LoadTSPTWProblem(cfg.TSPTW.InputFile, cfg.TSPTW.Speed)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error loading TSPTW problem: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Problem: %s\n", problem.Name)
+	fmt.Printf("Number of cities: %d\n", problem.NumCities)
+	fmt.Printf("Speed: %.2f\n", problem.Speed)
+	fmt.Println()
+	fmt.Println("=== City Time Windows ===")
+	for _, c := range problem.Cities {
+		fmt.Printf("  City %d: (%.1f, %.1f) TW=[%.0f, %.0f] Service=%.0f\n",
+			c.ID, c.X, c.Y, c.Earliest, c.Latest, c.ServiceTime)
+	}
+
+	solver := tsptw.NewTSPTWSolver(problem, &cfg.TSPTW)
+	result := solver.Solve()
+
+	eval := result.BestEval
+
+	fmt.Println()
+	fmt.Println("=== TSPTW Results ===")
+	fmt.Printf("Best tour: %v\n", result.BestTour)
+	fmt.Printf("Total travel distance: %.4f\n", eval.TotalDistance)
+	fmt.Printf("Total wait time: %.4f\n", eval.TotalWaitTime)
+	fmt.Printf("Total violation time: %.4f\n", eval.TotalViolation)
+	fmt.Printf("Feasible: %v\n", eval.IsFeasible)
+	fmt.Printf("Penalized cost: %.4f\n", result.BestCost)
+	fmt.Printf("Final penalty coefficient: %.4f\n", result.FinalPenalty)
+	fmt.Printf("Feasible ratio in population: %.2f%%\n", result.FeasibleRatio*100)
+	fmt.Printf("Duration: %v\n", result.Duration)
+
+	fmt.Println()
+	fmt.Println("=== Time Schedule ===")
+	fmt.Printf("%-6s %-8s %-8s %-8s %-8s %-10s %-10s\n",
+		"City", "Arrive", "Wait", "Start", "Leave", "TW", "Violation")
+	fmt.Println(strings.Repeat("-", 70))
+	for _, v := range eval.Visits {
+		city := problem.Cities[v.CityID]
+		violStr := ""
+		if v.Violation > 1e-10 {
+			violStr = fmt.Sprintf("*** %.2f", v.Violation)
+		}
+		fmt.Printf("%-6d %-8.2f %-8.2f %-8.2f %-8.2f [%-.0f,%-.0f]  %-10s\n",
+			v.CityID, v.ArrivalTime, v.WaitTime, v.ServiceStart, v.ServiceEnd,
+			city.Earliest, city.Latest, violStr)
+	}
+	fmt.Println(strings.Repeat("-", 70))
+	fmt.Printf("Total wait: %.2f, Total violation: %.2f\n", eval.TotalWaitTime, eval.TotalViolation)
+
+	if !eval.IsFeasible {
+		fmt.Println()
+		fmt.Println("!!! TIME WINDOW VIOLATIONS DETECTED !!!")
+		for _, v := range eval.Visits {
+			if v.Violation > 1e-10 {
+				fmt.Printf("  City %d: arrived at %.2f, latest = %.0f, VIOLATED by %.2f minutes\n",
+					v.CityID, v.ServiceStart, problem.Cities[v.CityID].Latest, v.Violation)
+			}
+		}
+	}
+
+	if cfg.TSPTW.OutputSVG != "" {
+		if err := output.GenerateTSPTWVisualization(problem, result.BestTour, eval, cfg.TSPTW.OutputSVG); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: could not generate SVG: %v\n", err)
+		} else {
+			fmt.Printf("Visualization written to: %s\n", cfg.TSPTW.OutputSVG)
+		}
+	}
+
+	if cfg.TSPTW.OutputResult != "" {
+		var sb strings.Builder
+		sb.WriteString(fmt.Sprintf("Problem: %s\nCities: %d\nBest Distance: %.4f\nTotal Wait: %.4f\nTotal Violation: %.4f\nFeasible: %v\nDuration: %v\n\nTour:\n%v\n\n",
+			problem.Name, problem.NumCities, eval.TotalDistance, eval.TotalWaitTime, eval.TotalViolation, eval.IsFeasible, result.Duration, result.BestTour))
+		sb.WriteString("Time Schedule:\n")
+		for _, v := range eval.Visits {
+			city := problem.Cities[v.CityID]
+			violStr := ""
+			if v.Violation > 1e-10 {
+				violStr = fmt.Sprintf(" VIOLATED(%.2f)", v.Violation)
+			}
+			sb.WriteString(fmt.Sprintf("City %d: arrive=%.2f wait=%.2f start=%.2f leave=%.2f TW=[%.0f,%.0f]%s\n",
+				v.CityID, v.ArrivalTime, v.WaitTime, v.ServiceStart, v.ServiceEnd, city.Earliest, city.Latest, violStr))
+		}
+		if err := os.WriteFile(cfg.TSPTW.OutputResult, []byte(sb.String()), 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: could not write result: %v\n", err)
+		} else {
+			fmt.Printf("Result written to: %s\n", cfg.TSPTW.OutputResult)
+		}
+	}
 }
 
 func applyOverrides(cfg *config.Config, args []string) {

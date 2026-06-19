@@ -1,7 +1,7 @@
 Problem: data/cities.txt
 Cities: 20
-Best Distance: 57.3081
-Duration: 50.147041ms
+Best Distance: 82.4570
+Duration: 96.50275ms
 
 Tour:
-[15 13 11 9 7 5 3 1 2 0 4 6 8 10 12 14 16 18 19 17]
+[3 7 5 9 13 11 12 10 18 19 17 15 16 14 4 6 8 2 0 1]

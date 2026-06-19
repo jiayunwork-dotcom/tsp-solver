@@ -1,0 +1,13 @@
+# TSPTW 10-city instance with tight time windows
+# Format: x y earliest latest service_time
+# City 0 is the depot with wide time window
+0 0 0 1000 0
+2 3 10 50 5
+5 1 30 80 8
+7 4 50 120 6
+4 7 80 160 10
+1 5 40 100 5
+8 8 100 200 8
+6 2 60 140 6
+3 8 90 180 7
+9 6 120 250 5

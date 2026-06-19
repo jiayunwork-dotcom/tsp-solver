@@ -1,0 +1,22 @@
+Problem: data/tsptw_10cities.txt
+Cities: 10
+Best Distance: 38.7973
+Total Wait: 32.6058
+Total Violation: 0.0000
+Feasible: true
+Duration: 17.930334ms
+
+Tour:
+[2 1 5 0 7 3 4 8 6 9]
+
+Time Schedule:
+City 2: arrive=0.00 wait=30.00 start=30.00 leave=38.00 TW=[30,80]
+City 1: arrive=41.61 wait=0.00 start=41.61 leave=46.61 TW=[10,50]
+City 5: arrive=48.84 wait=0.00 start=48.84 leave=53.84 TW=[40,100]
+City 0: arrive=58.94 wait=0.00 start=58.94 leave=58.94 TW=[0,1000]
+City 7: arrive=65.27 wait=0.00 start=65.27 leave=71.27 TW=[60,140]
+City 3: arrive=73.50 wait=0.00 start=73.50 leave=79.50 TW=[50,120]
+City 4: arrive=83.74 wait=0.00 start=83.74 leave=93.74 TW=[80,160]
+City 8: arrive=95.16 wait=0.00 start=95.16 leave=102.16 TW=[90,180]
+City 6: arrive=107.16 wait=0.00 start=107.16 leave=115.16 TW=[100,200]
+City 9: arrive=117.39 wait=2.61 start=120.00 leave=125.00 TW=[120,250]

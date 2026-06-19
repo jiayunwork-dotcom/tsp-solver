@@ -122,10 +122,33 @@ type BenchmarkConfig struct {
 	OutputFile string  `yaml:"output_file"`
 }
 
+type TSPTWConfig struct {
+	PenaltyType           string  `yaml:"penalty_type"`
+	PenaltyCoefficient    float64 `yaml:"penalty_coefficient"`
+	FeasibilityTarget     float64 `yaml:"feasibility_target"`
+	PenaltyAdjustInterval int     `yaml:"penalty_adjust_interval"`
+	RepairEnabled         bool    `yaml:"repair_enabled"`
+	RepairInterval        int     `yaml:"repair_interval"`
+	RepairTopK            int     `yaml:"repair_top_k"`
+	Speed                 float64 `yaml:"speed"`
+	InputFile             string  `yaml:"input_file"`
+	OutputCSV             string  `yaml:"output_csv"`
+	OutputSVG             string  `yaml:"output_svg"`
+	OutputResult          string  `yaml:"output_result"`
+	PopulationSize        int     `yaml:"population_size"`
+	Generations           int     `yaml:"generations"`
+	CrossoverRate         float64 `yaml:"crossover_rate"`
+	MutationRate          float64 `yaml:"mutation_rate"`
+	TournamentSize        int     `yaml:"tournament_size"`
+	EliteCount            int     `yaml:"elite_count"`
+	Verbose               bool    `yaml:"verbose"`
+}
+
 type Config struct {
 	GA         GAConfig         `yaml:"ga"`
 	GridSearch GridSearchConfig `yaml:"grid_search"`
 	Benchmark  BenchmarkConfig  `yaml:"benchmark"`
+	TSPTW      TSPTWConfig      `yaml:"tsptw"`
 }
 
 func LoadConfig(filePath string) (*Config, error) {
@@ -260,6 +283,46 @@ func setDefaults(config *Config) {
 
 	if config.Benchmark.Runs == 0 {
 		config.Benchmark.Runs = 5
+	}
+
+	if config.TSPTW.PenaltyType == "" {
+		config.TSPTW.PenaltyType = "fixed"
+	}
+	if config.TSPTW.PenaltyCoefficient == 0 {
+		config.TSPTW.PenaltyCoefficient = 100.0
+	}
+	if config.TSPTW.FeasibilityTarget == 0 {
+		config.TSPTW.FeasibilityTarget = 0.5
+	}
+	if config.TSPTW.PenaltyAdjustInterval == 0 {
+		config.TSPTW.PenaltyAdjustInterval = 10
+	}
+	if config.TSPTW.RepairInterval == 0 {
+		config.TSPTW.RepairInterval = 10
+	}
+	if config.TSPTW.RepairTopK == 0 {
+		config.TSPTW.RepairTopK = 5
+	}
+	if config.TSPTW.Speed == 0 {
+		config.TSPTW.Speed = 1.0
+	}
+	if config.TSPTW.PopulationSize == 0 {
+		config.TSPTW.PopulationSize = 100
+	}
+	if config.TSPTW.Generations == 0 {
+		config.TSPTW.Generations = 500
+	}
+	if config.TSPTW.CrossoverRate == 0 {
+		config.TSPTW.CrossoverRate = 0.8
+	}
+	if config.TSPTW.MutationRate == 0 {
+		config.TSPTW.MutationRate = 0.02
+	}
+	if config.TSPTW.TournamentSize == 0 {
+		config.TSPTW.TournamentSize = 3
+	}
+	if config.TSPTW.EliteCount == 0 {
+		config.TSPTW.EliteCount = 2
 	}
 }
 
