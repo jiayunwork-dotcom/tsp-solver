@@ -65,6 +65,7 @@ func runSolve(args []string) {
 	outputResult := fs.String("result", "", "Output result file (overrides config)")
 	seed := fs.Int64("seed", 0, "Random seed")
 	verbose := fs.Bool("verbose", false, "Verbose output")
+	bestKnown := fs.Float64("best-known", 0, "Known optimal solution distance for GAP calculation")
 
 	population := fs.Int("population", 0, "Population size (overrides config)")
 	generations := fs.Int("generations", 0, "Number of generations (overrides config)")
@@ -156,23 +157,65 @@ func runSolve(args []string) {
 	bestTour := solver.GetBestTour()
 	bestDistance := solver.GetBestDistance()
 
+	totalGens := result.History.Generations[len(result.History.Generations)-1]
+	durationMs := result.Duration.Milliseconds()
+	avgGenMs := 0.0
+	if totalGens > 0 {
+		avgGenMs = float64(durationMs) / float64(totalGens)
+	}
+
+	diversityDecay := 0.0
+	if result.InitialDiversity > 1e-15 {
+		diversityDecay = (result.InitialDiversity - result.FinalDiversity) / result.InitialDiversity * 100.0
+	}
+
 	fmt.Println()
 	fmt.Println("=== Results ===")
 	fmt.Printf("Best tour length: %.4f\n", bestDistance)
-	fmt.Printf("Generations: %d\n", result.History.Generations[len(result.History.Generations)-1])
+	fmt.Printf("Generations: %d\n", totalGens)
 	fmt.Printf("Duration: %v\n", result.Duration)
 
 	if len(bestTour) <= 50 {
 		fmt.Printf("Best tour: %v\n", bestTour)
 	}
 
-	if cfg.GA.TSP.OptimalFile != "" {
+	if *bestKnown > 0 {
+		gap := (bestDistance - *bestKnown) / *bestKnown * 100
+		fmt.Printf("Best known: %.4f\n", *bestKnown)
+		fmt.Printf("Gap to best known: %.2f%%\n", gap)
+	} else if cfg.GA.TSP.OptimalFile != "" {
 		optTour, err := tsp.LoadOptimalTour(cfg.GA.TSP.OptimalFile)
 		if err == nil && len(optTour) == problem.NumCities {
 			optDist := problem.TourLength(optTour)
 			gap := (bestDistance - optDist) / optDist * 100
 			fmt.Printf("Optimal distance: %.4f\n", optDist)
 			fmt.Printf("Gap to optimal: %.2f%%\n", gap)
+		}
+	}
+
+	fmt.Println()
+	fmt.Println("=== Statistics Summary ===")
+	fmt.Printf("Total time: %d ms\n", durationMs)
+	fmt.Printf("Avg time per generation: %.2f ms\n", avgGenMs)
+	fmt.Printf("First found best at generation: %d\n", result.FirstBestGeneration)
+	fmt.Printf("Diversity decay: %.2f%% (initial: %.6f -> final: %.6f)\n", diversityDecay, result.InitialDiversity, result.FinalDiversity)
+	if cfg.GA.LocalSearch.Enabled {
+		fmt.Printf("Local search calls: %d\n", result.LocalSearchCalls)
+		fmt.Printf("Local search total improvement: %.4f\n", result.LocalSearchImproved)
+	}
+	if len(result.IslandMigrationStats) > 0 {
+		fmt.Printf("Best solution from Island #%d\n", result.BestIslandID)
+		if *verbose || cfg.GA.Output.Verbose {
+			fmt.Println()
+			fmt.Println("=== Island Migration Statistics ===")
+			for _, stat := range result.IslandMigrationStats {
+				improveRatio := 0.0
+				if stat.ReceivedMigrations > 0 {
+					improveRatio = float64(stat.ImprovedAfter) / float64(stat.ReceivedMigrations) * 100.0
+				}
+				fmt.Printf("Island #%d: received %d migrations, improved after %d (%.1f%%)\n",
+					stat.IslandID, stat.ReceivedMigrations, stat.ImprovedAfter, improveRatio)
+			}
 		}
 	}
 
@@ -208,6 +251,7 @@ func runBenchmark(args []string) {
 	instances := fs.String("instances", "", "Comma-separated list of instance files (overrides config)")
 	runs := fs.Int("runs", 0, "Number of runs per instance (overrides config)")
 	outputFile := fs.String("output", "", "Output CSV file (overrides config)")
+	bestKnown := fs.Float64("best-known", 0, "Known optimal solution distance for GAP calculation")
 
 	fs.Parse(args)
 
@@ -233,7 +277,7 @@ func runBenchmark(args []string) {
 	}
 
 	fmt.Println("Running benchmarks...")
-	results, err := benchmark.RunBenchmark(cfg)
+	results, err := benchmark.RunBenchmark(cfg, *bestKnown)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error running benchmark: %v\n", err)
 		os.Exit(1)
@@ -250,7 +294,7 @@ func runBenchmark(args []string) {
 		fmt.Printf("  StdDev: %.4f\n", r.StdDev)
 		fmt.Printf("  Avg Time: %v\n", r.AvgTime)
 		if r.Optimal > 0 {
-			fmt.Printf("  Optimal: %.4f\n", r.Optimal)
+			fmt.Printf("  Optimal/Best-known: %.4f\n", r.Optimal)
 			fmt.Printf("  Gap: %.2f%%\n", r.GapPercent)
 		}
 	}
@@ -260,6 +304,7 @@ func runGridSearch(args []string) {
 	fs := flag.NewFlagSet("grid-search", flag.ExitOnError)
 	configFile := fs.String("config", "config.yaml", "Path to YAML configuration file")
 	inputFile := fs.String("input", "", "Input problem file")
+	bestKnown := fs.Float64("best-known", 0, "Known optimal solution distance for GAP calculation")
 
 	fs.Parse(args)
 
@@ -279,7 +324,7 @@ func runGridSearch(args []string) {
 	}
 
 	fmt.Println("Running grid search...")
-	results, err := benchmark.RunGridSearch(cfg, cfg.GA.TSP.InputFile)
+	results, err := benchmark.RunGridSearch(cfg, cfg.GA.TSP.InputFile, *bestKnown)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error running grid search: %v\n", err)
 		os.Exit(1)
@@ -287,6 +332,9 @@ func runGridSearch(args []string) {
 
 	fmt.Println()
 	fmt.Println("=== Grid Search Results ===")
+	if *bestKnown > 0 {
+		fmt.Printf("(sorted by GAP%%, best-known=%.4f)\n", *bestKnown)
+	}
 	fmt.Println(strings.Repeat("=", 80))
 	fmt.Printf("%-6s %-6s %-8s %-10s %-14s %-10s\n",
 		"POP", "GEN", "CX_RATE", "MUT_RATE", "BEST_DIST", "GAP%")

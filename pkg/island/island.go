@@ -17,9 +17,11 @@ type MigrationPolicy struct {
 }
 
 type Island struct {
-	ID     int
-	GA     *ga.GeneticAlgorithm
-	Config ga.GAConfig
+	ID                 int
+	GA                 *ga.GeneticAlgorithm
+	Config             ga.GAConfig
+	ReceivedMigrations int
+	ImprovedAfter      int
 }
 
 type IslandModel struct {
@@ -29,9 +31,10 @@ type IslandModel struct {
 	Gen             int
 	TotalGens       int
 	History         *ga.GAGenerationHistory
+	Verbose         bool
 }
 
-func NewIslandModel(numIslands int, baseConfig ga.GAConfig, migrationPolicy MigrationPolicy, configVariants []ga.GAConfig) *IslandModel {
+func NewIslandModel(numIslands int, baseConfig ga.GAConfig, migrationPolicy MigrationPolicy, configVariants []ga.GAConfig, verbose bool) *IslandModel {
 	islands := make([]*Island, numIslands)
 
 	for i := 0; i < numIslands; i++ {
@@ -42,9 +45,11 @@ func NewIslandModel(numIslands int, baseConfig ga.GAConfig, migrationPolicy Migr
 
 		islandGA := ga.NewGeneticAlgorithm(config)
 		islands[i] = &Island{
-			ID:     i,
-			GA:     islandGA,
-			Config: config,
+			ID:                 i,
+			GA:                 islandGA,
+			Config:             config,
+			ReceivedMigrations: 0,
+			ImprovedAfter:      0,
 		}
 	}
 
@@ -54,6 +59,7 @@ func NewIslandModel(numIslands int, baseConfig ga.GAConfig, migrationPolicy Migr
 		NumIslands:      numIslands,
 		TotalGens:       baseConfig.Generations,
 		History:         ga.NewGAGenerationHistory(),
+		Verbose:         verbose,
 	}
 
 	return model
@@ -99,14 +105,22 @@ func (model *IslandModel) migrateRing() {
 		numMigrants = 1
 	}
 
-	migrants := make([][] *encoding.Individual, model.NumIslands)
+	migrants := make([][]*encoding.Individual, model.NumIslands)
+	prevBest := make([]float64, model.NumIslands)
 	for i, island := range model.Islands {
 		migrants[i] = model.selectMigrants(island, numMigrants)
+		prevBest[i] = island.GA.BestIndividual().Fitness
 	}
 
 	for i, island := range model.Islands {
 		neighborIdx := (i + 1) % model.NumIslands
 		model.replaceWorst(island, migrants[neighborIdx])
+		island.ReceivedMigrations++
+
+		newBest := island.GA.BestIndividual().Fitness
+		if newBest > prevBest[i]+1e-15 {
+			island.ImprovedAfter++
+		}
 	}
 }
 
@@ -175,6 +189,19 @@ func (model *IslandModel) BestIndividual() *encoding.Individual {
 	return best
 }
 
+func (model *IslandModel) BestIslandID() int {
+	bestID := 0
+	var best *encoding.Individual
+	for idx, island := range model.Islands {
+		ib := island.GA.BestIndividual()
+		if best == nil || ib.Fitness > best.Fitness {
+			best = ib
+			bestID = idx
+		}
+	}
+	return bestID
+}
+
 func (model *IslandModel) AvgFitness() float64 {
 	total := 0.0
 	count := 0
@@ -203,27 +230,60 @@ func (model *IslandModel) OverallDiversity() float64 {
 func (model *IslandModel) Run() *ga.GAResult {
 	start := time.Now()
 
+	initialDiversity := 0.0
+	if len(model.Islands) > 0 && len(model.Islands[0].GA.History.Diversity) > 0 {
+		initialDiversity = model.Islands[0].GA.History.Diversity[0]
+	}
+
+	overallBestFitness := model.BestIndividual().Fitness
+	firstBestGen := 0
+	bestIslandID := model.BestIslandID()
+
 	for model.Step() {
-		if model.Gen%10 == 0 {
+		curBest := model.BestIndividual().Fitness
+		if curBest > overallBestFitness+1e-15 {
+			overallBestFitness = curBest
+			firstBestGen = model.Gen
+			bestIslandID = model.BestIslandID()
+		}
+
+		if model.Verbose && model.Gen%10 == 0 {
 			best := model.BestIndividual()
-			println("Generation", model.Gen, "Best Fitness:", best.Fitness)
+			println("Generation", model.Gen, "Best Fitness:", best.Fitness, "Best Island:", bestIslandID)
+		}
+
+		if model.Verbose && model.MigrationPolicy.Interval > 0 && model.Gen%model.MigrationPolicy.Interval == 0 {
+			println("  Migration event", model.MigrationPolicy.MigrationCount, "completed")
 		}
 	}
 
 	best := model.BestIndividual()
-	bestGen := 0
-	for i, fit := range model.History.BestFitness {
-		if fit >= best.Fitness {
-			bestGen = i
-			break
+	bestIslandID = model.BestIslandID()
+
+	finalDiversity := 0.0
+	if len(model.History.Diversity) > 0 {
+		finalDiversity = model.History.Diversity[len(model.History.Diversity)-1]
+	}
+
+	migrationStats := make([]ga.IslandMigrationStat, len(model.Islands))
+	for i, island := range model.Islands {
+		migrationStats[i] = ga.IslandMigrationStat{
+			IslandID:           island.ID,
+			ReceivedMigrations: island.ReceivedMigrations,
+			ImprovedAfter:      island.ImprovedAfter,
 		}
 	}
 
 	return &ga.GAResult{
-		BestIndividual: best,
-		BestFitness:    best.Fitness,
-		BestGeneration: bestGen,
-		History:        model.History,
-		Duration:       time.Since(start),
+		BestIndividual:      best,
+		BestFitness:         best.Fitness,
+		BestGeneration:      model.Gen,
+		FirstBestGeneration: firstBestGen,
+		History:             model.History,
+		Duration:            time.Since(start),
+		InitialDiversity:    initialDiversity,
+		FinalDiversity:      finalDiversity,
+		BestIslandID:        bestIslandID,
+		IslandMigrationStats: migrationStats,
 	}
 }

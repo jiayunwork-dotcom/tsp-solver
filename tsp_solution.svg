@@ -5,51 +5,72 @@
     .path { stroke: #3498db; stroke-width: 2; fill: none; opacity: 0.8; }
     .start-city { fill: #27ae60; stroke: #1e8449; stroke-width: 2; }
     .label { font-family: Arial, sans-serif; font-size: 10px; fill: #333; }
+    .edge-label { font-family: Arial, sans-serif; font-size: 8px; fill: #888; }
     .title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2c3e50; }
     .info { font-family: Arial, sans-serif; font-size: 12px; fill: #7f8c8d; }
   </style>
 
   <text x="400" y="30" text-anchor="middle" class="title">TSP Path: data/cities.txt</text>
-  <text x="400" y="50" text-anchor="middle" class="info">Cities: 20 | Distance: 70.49</text>
-  <path d="M 234.21 134.21 L 307.89 171.05 L 381.58 244.74 L 344.74 355.26 L 455.26 281.58 L 492.11 392.11 L 418.42 465.79 L 565.79 428.95 L 639.47 318.42 L 713.16 355.26 L 750.00 244.74 L 676.32 171.05 L 602.63 134.21 L 528.95 207.89 L 160.53 207.89 L 86.84 281.58 L 123.68 392.11 L 50.00 465.79 L 197.37 428.95 L 271.05 318.42 L 234.21 134.21 Z" class="path"/>
-  <circle cx="234.21" cy="134.21" r="6.0" class="start-city"/>
-  <text x="234.21" y="126.21" text-anchor="middle" dy="%!f(int=0)" class="label">5</text>
-  <circle cx="307.89" cy="171.05" r="4.0" class="city"/>
-  <text x="307.89" y="163.05" text-anchor="middle" dy="%!f(int=0)" class="label">7</text>
-  <circle cx="381.58" cy="244.74" r="4.0" class="city"/>
-  <text x="381.58" y="236.74" text-anchor="middle" dy="%!f(int=0)" class="label">9</text>
-  <circle cx="344.74" cy="355.26" r="4.0" class="city"/>
-  <text x="344.74" y="347.26" text-anchor="middle" dy="%!f(int=0)" class="label">8</text>
-  <circle cx="455.26" cy="281.58" r="4.0" class="city"/>
-  <text x="455.26" y="273.58" text-anchor="middle" dy="%!f(int=0)" class="label">11</text>
-  <circle cx="492.11" cy="392.11" r="4.0" class="city"/>
-  <text x="492.11" y="384.11" text-anchor="middle" dy="%!f(int=0)" class="label">12</text>
-  <circle cx="418.42" cy="465.79" r="4.0" class="city"/>
-  <text x="418.42" y="457.79" text-anchor="middle" dy="%!f(int=0)" class="label">10</text>
-  <circle cx="565.79" cy="428.95" r="4.0" class="city"/>
-  <text x="565.79" y="420.95" text-anchor="middle" dy="%!f(int=0)" class="label">14</text>
-  <circle cx="639.47" cy="318.42" r="4.0" class="city"/>
-  <text x="639.47" y="310.42" text-anchor="middle" dy="%!f(int=0)" class="label">16</text>
-  <circle cx="713.16" cy="355.26" r="4.0" class="city"/>
-  <text x="713.16" y="347.26" text-anchor="middle" dy="%!f(int=0)" class="label">18</text>
-  <circle cx="750.00" cy="244.74" r="4.0" class="city"/>
-  <text x="750.00" y="236.74" text-anchor="middle" dy="%!f(int=0)" class="label">19</text>
-  <circle cx="676.32" cy="171.05" r="4.0" class="city"/>
-  <text x="676.32" y="163.05" text-anchor="middle" dy="%!f(int=0)" class="label">17</text>
-  <circle cx="602.63" cy="134.21" r="4.0" class="city"/>
-  <text x="602.63" y="126.21" text-anchor="middle" dy="%!f(int=0)" class="label">15</text>
+  <text x="400" y="50" text-anchor="middle" class="info">Cities: 20 | Distance: 57.31</text>
+  <path d="M 602.63 134.21 L 528.95 207.89 L 455.26 281.58 L 381.58 244.74 L 307.89 171.05 L 234.21 134.21 L 160.53 207.89 L 86.84 281.58 L 123.68 392.11 L 50.00 465.79 L 197.37 428.95 L 271.05 318.42 L 344.74 355.26 L 418.42 465.79 L 492.11 392.11 L 565.79 428.95 L 639.47 318.42 L 713.16 355.26 L 750.00 244.74 L 676.32 171.05 L 602.63 134.21 Z" class="path"/>
+  <text x="563.79" y="169.05" text-anchor="middle" class="edge-label">2.8</text>
+  <text x="490.11" y="242.74" text-anchor="middle" class="edge-label">2.8</text>
+  <text x="419.69" y="260.63" text-anchor="middle" class="edge-label">2.2</text>
+  <text x="346.74" y="205.89" text-anchor="middle" class="edge-label">2.8</text>
+  <text x="272.32" y="150.10" text-anchor="middle" class="edge-label">2.2</text>
+  <text x="195.37" y="169.05" text-anchor="middle" class="edge-label">2.8</text>
+  <text x="121.68" y="242.74" text-anchor="middle" class="edge-label">2.8</text>
+  <text x="102.58" y="337.74" text-anchor="middle" class="edge-label">3.2</text>
+  <text x="84.84" y="426.95" text-anchor="middle" class="edge-label">2.8</text>
+  <text x="124.37" y="450.11" text-anchor="middle" class="edge-label">4.1</text>
+  <text x="236.56" y="375.25" text-anchor="middle" class="edge-label">3.6</text>
+  <text x="306.63" y="339.37" text-anchor="middle" class="edge-label">2.2</text>
+  <text x="379.23" y="412.10" text-anchor="middle" class="edge-label">3.6</text>
+  <text x="457.26" y="430.95" text-anchor="middle" class="edge-label">2.8</text>
+  <text x="527.68" y="413.06" text-anchor="middle" class="edge-label">2.2</text>
+  <text x="604.98" y="375.25" text-anchor="middle" class="edge-label">3.6</text>
+  <text x="675.05" y="339.37" text-anchor="middle" class="edge-label">2.2</text>
+  <text x="734.26" y="300.89" text-anchor="middle" class="edge-label">3.2</text>
+  <text x="715.16" y="205.89" text-anchor="middle" class="edge-label">2.8</text>
+  <text x="640.74" y="150.10" text-anchor="middle" class="edge-label">2.2</text>
+  <circle cx="602.63" cy="134.21" r="6.0" class="start-city"/>
+  <text x="602.63" y="124.21" text-anchor="middle" class="label">15</text>
   <circle cx="528.95" cy="207.89" r="4.0" class="city"/>
-  <text x="528.95" y="199.89" text-anchor="middle" dy="%!f(int=0)" class="label">13</text>
+  <text x="528.95" y="197.89" text-anchor="middle" class="label">13</text>
+  <circle cx="455.26" cy="281.58" r="4.0" class="city"/>
+  <text x="455.26" y="271.58" text-anchor="middle" class="label">11</text>
+  <circle cx="381.58" cy="244.74" r="4.0" class="city"/>
+  <text x="381.58" y="234.74" text-anchor="middle" class="label">9</text>
+  <circle cx="307.89" cy="171.05" r="4.0" class="city"/>
+  <text x="307.89" y="161.05" text-anchor="middle" class="label">7</text>
+  <circle cx="234.21" cy="134.21" r="4.0" class="city"/>
+  <text x="234.21" y="124.21" text-anchor="middle" class="label">5</text>
   <circle cx="160.53" cy="207.89" r="4.0" class="city"/>
-  <text x="160.53" y="199.89" text-anchor="middle" dy="%!f(int=0)" class="label">3</text>
+  <text x="160.53" y="197.89" text-anchor="middle" class="label">3</text>
   <circle cx="86.84" cy="281.58" r="4.0" class="city"/>
-  <text x="86.84" y="273.58" text-anchor="middle" dy="%!f(int=0)" class="label">1</text>
+  <text x="86.84" y="271.58" text-anchor="middle" class="label">1</text>
   <circle cx="123.68" cy="392.11" r="4.0" class="city"/>
-  <text x="123.68" y="384.11" text-anchor="middle" dy="%!f(int=0)" class="label">2</text>
+  <text x="123.68" y="382.11" text-anchor="middle" class="label">2</text>
   <circle cx="50.00" cy="465.79" r="4.0" class="city"/>
-  <text x="50.00" y="457.79" text-anchor="middle" dy="%!f(int=0)" class="label">0</text>
+  <text x="50.00" y="455.79" text-anchor="middle" class="label">0</text>
   <circle cx="197.37" cy="428.95" r="4.0" class="city"/>
-  <text x="197.37" y="420.95" text-anchor="middle" dy="%!f(int=0)" class="label">4</text>
+  <text x="197.37" y="418.95" text-anchor="middle" class="label">4</text>
   <circle cx="271.05" cy="318.42" r="4.0" class="city"/>
-  <text x="271.05" y="310.42" text-anchor="middle" dy="%!f(int=0)" class="label">6</text>
+  <text x="271.05" y="308.42" text-anchor="middle" class="label">6</text>
+  <circle cx="344.74" cy="355.26" r="4.0" class="city"/>
+  <text x="344.74" y="345.26" text-anchor="middle" class="label">8</text>
+  <circle cx="418.42" cy="465.79" r="4.0" class="city"/>
+  <text x="418.42" y="455.79" text-anchor="middle" class="label">10</text>
+  <circle cx="492.11" cy="392.11" r="4.0" class="city"/>
+  <text x="492.11" y="382.11" text-anchor="middle" class="label">12</text>
+  <circle cx="565.79" cy="428.95" r="4.0" class="city"/>
+  <text x="565.79" y="418.95" text-anchor="middle" class="label">14</text>
+  <circle cx="639.47" cy="318.42" r="4.0" class="city"/>
+  <text x="639.47" y="308.42" text-anchor="middle" class="label">16</text>
+  <circle cx="713.16" cy="355.26" r="4.0" class="city"/>
+  <text x="713.16" y="345.26" text-anchor="middle" class="label">18</text>
+  <circle cx="750.00" cy="244.74" r="4.0" class="city"/>
+  <text x="750.00" y="234.74" text-anchor="middle" class="label">19</text>
+  <circle cx="676.32" cy="171.05" r="4.0" class="city"/>
+  <text x="676.32" y="161.05" text-anchor="middle" class="label">17</text>
 </svg>

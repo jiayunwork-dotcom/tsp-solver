@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 	"time"
 
@@ -34,7 +35,7 @@ type GridSearchResult struct {
 	GapPercent     float64
 }
 
-func RunBenchmark(cfg *config.Config) ([]BenchmarkResult, error) {
+func RunBenchmark(cfg *config.Config, bestKnown float64) ([]BenchmarkResult, error) {
 	var results []BenchmarkResult
 
 	for _, instanceFile := range cfg.Benchmark.Instances {
@@ -47,8 +48,8 @@ func RunBenchmark(cfg *config.Config) ([]BenchmarkResult, error) {
 			}
 		}
 
-		optimal := 0.0
-		if cfg.GA.TSP.OptimalFile != "" {
+		optimal := bestKnown
+		if optimal == 0 && cfg.GA.TSP.OptimalFile != "" {
 			optTour, err := tsp.LoadOptimalTour(cfg.GA.TSP.OptimalFile)
 			if err == nil && len(optTour) == problem.NumCities {
 				optimal = problem.TourLength(optTour)
@@ -163,7 +164,7 @@ func writeBenchmarkCSV(results []BenchmarkResult, filePath string) error {
 	return nil
 }
 
-func RunGridSearch(baseConfig *config.Config, instanceFile string) ([]GridSearchResult, error) {
+func RunGridSearch(baseConfig *config.Config, instanceFile string, bestKnown float64) ([]GridSearchResult, error) {
 	gsCfg := &baseConfig.GridSearch
 
 	problem, err := tsp.LoadTSPProblem(instanceFile, tsp.TSPLIBFormat)
@@ -174,8 +175,8 @@ func RunGridSearch(baseConfig *config.Config, instanceFile string) ([]GridSearch
 		}
 	}
 
-	optimal := 0.0
-	if baseConfig.GA.TSP.OptimalFile != "" {
+	optimal := bestKnown
+	if optimal == 0 && baseConfig.GA.TSP.OptimalFile != "" {
 		optTour, err := tsp.LoadOptimalTour(baseConfig.GA.TSP.OptimalFile)
 		if err == nil && len(optTour) == problem.NumCities {
 			optimal = problem.TourLength(optTour)
@@ -244,6 +245,13 @@ func RunGridSearch(baseConfig *config.Config, instanceFile string) ([]GridSearch
 			}
 		}
 	}
+
+	sort.Slice(results, func(i, j int) bool {
+		if optimal > 0 {
+			return results[i].GapPercent < results[j].GapPercent
+		}
+		return results[i].BestDistance < results[j].BestDistance
+	})
 
 	if gsCfg.OutputFile != "" {
 		if err := writeGridSearchCSV(results, gsCfg.OutputFile); err != nil {

@@ -32,26 +32,43 @@ type GAConfig struct {
 }
 
 type GAResult struct {
-	BestIndividual *encoding.Individual
-	BestFitness    float64
-	BestGeneration int
-	History        *GAGenerationHistory
-	Duration       time.Duration
+	BestIndividual       *encoding.Individual
+	BestFitness          float64
+	BestGeneration       int
+	FirstBestGeneration  int
+	History              *GAGenerationHistory
+	Duration             time.Duration
+	LocalSearchCalls     int
+	LocalSearchImproved  float64
+	InitialDiversity     float64
+	FinalDiversity       float64
+	BestIslandID         int
+	IslandMigrationStats []IslandMigrationStat
+}
+
+type IslandMigrationStat struct {
+	IslandID           int
+	ReceivedMigrations int
+	ImprovedAfter      int
 }
 
 type GAGenerationHistory struct {
-	Generations   []int
-	BestFitness   []float64
-	AvgFitness    []float64
-	Diversity     []float64
+	Generations      []int
+	BestFitness      []float64
+	AvgFitness       []float64
+	Diversity        []float64
+	ImprovementRate  []float64
+	StagnationCount  []int
 }
 
 func NewGAGenerationHistory() *GAGenerationHistory {
 	return &GAGenerationHistory{
-		Generations: make([]int, 0),
-		BestFitness: make([]float64, 0),
-		AvgFitness:  make([]float64, 0),
-		Diversity:   make([]float64, 0),
+		Generations:     make([]int, 0),
+		BestFitness:     make([]float64, 0),
+		AvgFitness:      make([]float64, 0),
+		Diversity:       make([]float64, 0),
+		ImprovementRate: make([]float64, 0),
+		StagnationCount: make([]int, 0),
 	}
 }
 
@@ -60,6 +77,25 @@ func (h *GAGenerationHistory) Add(gen int, best, avg, diversity float64) {
 	h.BestFitness = append(h.BestFitness, best)
 	h.AvgFitness = append(h.AvgFitness, avg)
 	h.Diversity = append(h.Diversity, diversity)
+
+	idx := len(h.BestFitness) - 1
+	if idx == 0 {
+		h.ImprovementRate = append(h.ImprovementRate, 0.0)
+		h.StagnationCount = append(h.StagnationCount, 0)
+	} else {
+		prevBest := h.BestFitness[idx-1]
+		improveRate := 0.0
+		if prevBest > 1e-15 {
+			improveRate = (best - prevBest) / prevBest * 100.0
+		}
+		h.ImprovementRate = append(h.ImprovementRate, improveRate)
+
+		if best > prevBest+1e-15 {
+			h.StagnationCount = append(h.StagnationCount, 0)
+		} else {
+			h.StagnationCount = append(h.StagnationCount, h.StagnationCount[idx-1]+1)
+		}
+	}
 }
 
 type GeneticAlgorithm struct {
@@ -87,6 +123,11 @@ func (ga *GeneticAlgorithm) initPopulation() {
 		ga.Config.Bounds,
 	)
 	ga.evaluatePopulation()
+
+	best := ga.Pop.Best()
+	avg := ga.Pop.AvgFitness()
+	diversity := ga.calculateDiversity()
+	ga.History.Add(0, best.Fitness, avg, diversity)
 }
 
 func (ga *GeneticAlgorithm) evaluatePopulation() {

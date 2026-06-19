@@ -3,6 +3,7 @@ package output
 import (
 	"encoding/csv"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 
@@ -20,7 +21,7 @@ func WriteConvergenceCSV(history *ga.GAGenerationHistory, filePath string) error
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	header := []string{"generation", "best_fitness", "avg_fitness", "diversity"}
+	header := []string{"generation", "best_fitness", "avg_fitness", "diversity", "improvement_rate", "stagnation_count"}
 	if err := writer.Write(header); err != nil {
 		return err
 	}
@@ -31,6 +32,8 @@ func WriteConvergenceCSV(history *ga.GAGenerationHistory, filePath string) error
 			strconv.FormatFloat(history.BestFitness[i], 'f', 10, 64),
 			strconv.FormatFloat(history.AvgFitness[i], 'f', 10, 64),
 			strconv.FormatFloat(history.Diversity[i], 'f', 10, 64),
+			strconv.FormatFloat(history.ImprovementRate[i], 'f', 6, 64),
+			strconv.Itoa(history.StagnationCount[i]),
 		}
 		if err := writer.Write(row); err != nil {
 			return err
@@ -85,6 +88,7 @@ func GenerateTSPVisualization(problem *tsp.TSPProblem, tour []int, outputPath st
     .path { stroke: #3498db; stroke-width: 2; fill: none; opacity: 0.8; }
     .start-city { fill: #27ae60; stroke: #1e8449; stroke-width: 2; }
     .label { font-family: Arial, sans-serif; font-size: 10px; fill: #333; }
+    .edge-label { font-family: Arial, sans-serif; font-size: 8px; fill: #888; }
     .title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2c3e50; }
     .info { font-family: Arial, sans-serif; font-size: 12px; fill: #7f8c8d; }
   </style>
@@ -96,6 +100,8 @@ func GenerateTSPVisualization(problem *tsp.TSPProblem, tour []int, outputPath st
 		width/2, problem.NumCities, problem.TourLength(tour))
 
 	pathData := ""
+	edgeLabels := ""
+	n := len(tour)
 	for i, cityIdx := range tour {
 		city := problem.Cities[cityIdx]
 		x := offsetX + (city.X-minX)*scale
@@ -105,6 +111,31 @@ func GenerateTSPVisualization(problem *tsp.TSPProblem, tour []int, outputPath st
 		} else {
 			pathData += fmt.Sprintf(" L %.2f %.2f", x, y)
 		}
+
+		nextIdx := tour[(i+1)%n]
+		nextCity := problem.Cities[nextIdx]
+		nx := offsetX + (nextCity.X-minX)*scale
+		ny := offsetY + (maxY-nextCity.Y)*scale
+
+		midX := (x + nx) / 2
+		midY := (y + ny) / 2
+
+		dist := problem.Distance(cityIdx, nextIdx)
+
+		dx := nx - x
+		dy := ny - y
+		perpX := -dy
+		perpY := dx
+		perpLen := 1.0
+		if perpX*perpX+perpY*perpY > 1e-10 {
+			perpLen = 8.0 / (perpX*perpX + perpY*perpY)
+			perpLen = math.Sqrt(perpLen)
+		}
+		labelX := midX + perpX*perpLen
+		labelY := midY + perpY*perpLen
+
+		edgeLabels += fmt.Sprintf(`  <text x="%.2f" y="%.2f" text-anchor="middle" class="edge-label">%.1f</text>`+"\n",
+			labelX, labelY, dist)
 	}
 	firstCity := problem.Cities[tour[0]]
 	firstX := offsetX + (firstCity.X-minX)*scale
@@ -112,6 +143,7 @@ func GenerateTSPVisualization(problem *tsp.TSPProblem, tour []int, outputPath st
 	pathData += fmt.Sprintf(" L %.2f %.2f Z", firstX, firstY)
 
 	svgContent += fmt.Sprintf(`  <path d="%s" class="path"/>`+"\n", pathData)
+	svgContent += edgeLabels
 
 	for i, cityIdx := range tour {
 		city := problem.Cities[cityIdx]

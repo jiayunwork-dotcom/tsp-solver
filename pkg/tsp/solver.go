@@ -2,6 +2,7 @@ package tsp
 
 import (
 	"sort"
+	"time"
 
 	"github.com/tsp-solver/pkg/config"
 	"github.com/tsp-solver/pkg/ga"
@@ -14,12 +15,14 @@ import (
 )
 
 type TSPSolver struct {
-	Problem *TSPProblem
-	Config  *config.GAConfig
-	GA       *ga.GeneticAlgorithm
-	KDTree   *local_search.KDTree
-	Points   []local_search.Point
-	DistFunc local_search.DistanceFunc
+	Problem             *TSPProblem
+	Config              *config.GAConfig
+	GA                  *ga.GeneticAlgorithm
+	KDTree              *local_search.KDTree
+	Points              []local_search.Point
+	DistFunc            local_search.DistanceFunc
+	LocalSearchCalls    int
+	LocalSearchImproved float64
 }
 
 func NewTSPSolver(problem *TSPProblem, cfg *config.GAConfig) *TSPSolver {
@@ -103,6 +106,8 @@ func (s *TSPSolver) createGAConfig() ga.GAConfig {
 }
 
 func (s *TSPSolver) Solve() *ga.GAResult {
+	start := time.Now()
+
 	gaConfig := s.createGAConfig()
 	s.GA = ga.NewGeneticAlgorithm(gaConfig)
 
@@ -114,11 +119,30 @@ func (s *TSPSolver) Solve() *ga.GAResult {
 
 	localSearchEnabled := s.Config.LocalSearch.Enabled
 
+	initialDiversity := 0.0
+	if len(s.GA.History.Diversity) > 0 {
+		initialDiversity = s.GA.History.Diversity[0]
+	}
+
+	overallBestFitness := s.GA.BestIndividual().Fitness
+	firstBestGen := 0
+
 	for s.GA.Gen < totalGens {
 		s.GA.Step()
 
+		curBest := s.GA.BestIndividual().Fitness
+		if curBest > overallBestFitness+1e-15 {
+			overallBestFitness = curBest
+			firstBestGen = s.GA.Gen
+		}
+
 		if localSearchEnabled && s.GA.Gen > 0 && s.GA.Gen%localSearchInterval == 0 {
 			s.applyLocalSearch()
+			curBest = s.GA.BestIndividual().Fitness
+			if curBest > overallBestFitness+1e-15 {
+				overallBestFitness = curBest
+				firstBestGen = s.GA.Gen
+			}
 		}
 
 		if s.Config.Output.Verbose && s.GA.Gen%10 == 0 {
@@ -130,19 +154,37 @@ func (s *TSPSolver) Solve() *ga.GAResult {
 
 	if localSearchEnabled {
 		s.applyLocalSearch()
+		curBest := s.GA.BestIndividual().Fitness
+		if curBest > overallBestFitness+1e-15 {
+			overallBestFitness = curBest
+			firstBestGen = s.GA.Gen
+		}
 	}
 
 	best := s.GA.BestIndividual()
 
+	finalDiversity := 0.0
+	if len(s.GA.History.Diversity) > 0 {
+		finalDiversity = s.GA.History.Diversity[len(s.GA.History.Diversity)-1]
+	}
+
 	return &ga.GAResult{
-		BestIndividual: best,
-		BestFitness:    best.Fitness,
-		BestGeneration: s.GA.Gen,
-		History:        s.GA.History,
+		BestIndividual:      best,
+		BestFitness:         best.Fitness,
+		BestGeneration:      s.GA.Gen,
+		FirstBestGeneration: firstBestGen,
+		History:             s.GA.History,
+		Duration:            time.Since(start),
+		LocalSearchCalls:    s.LocalSearchCalls,
+		LocalSearchImproved: s.LocalSearchImproved,
+		InitialDiversity:    initialDiversity,
+		FinalDiversity:      finalDiversity,
 	}
 }
 
 func (s *TSPSolver) applyLocalSearch() {
+	s.LocalSearchCalls++
+
 	pop := s.GA.Pop
 	sortedPop := pop.Copy()
 	sort.Sort(sortedPop)
@@ -155,7 +197,10 @@ func (s *TSPSolver) applyLocalSearch() {
 	lsType := s.Config.LocalSearch.Type
 	useKDTree := s.Config.LocalSearch.UseKDTree && s.Problem.NumCities >= s.Config.LocalSearch.KDTreeThreshold
 
+	totalImproved := 0.0
+
 	for i := 0; i < topK; i++ {
+		oldLength := 1.0 / sortedPop[i].Fitness
 		tour := sortedPop[i].GetPermutation()
 		var newTour []int
 		var newLength float64
@@ -179,12 +224,15 @@ func (s *TSPSolver) applyLocalSearch() {
 			}
 		}
 
-		if newLength < 1.0/sortedPop[i].Fitness {
+		if newLength < oldLength {
+			totalImproved += oldLength - newLength
 			sortedPop[i].SetPermutation(newTour)
 			sortedPop[i].Fitness = 1.0 / newLength
 			sortedPop[i].Evaluated = true
 		}
 	}
+
+	s.LocalSearchImproved += totalImproved
 
 	for i := 0; i < topK && i < len(pop); i++ {
 		found := false
