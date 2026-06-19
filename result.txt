@@ -1,0 +1,7 @@
+Problem: data/cities.txt
+Cities: 20
+Best Distance: 70.4898
+Duration: 0s
+
+Tour:
+[5 7 9 8 11 12 10 14 16 18 19 17 15 13 3 1 2 0 4 6]

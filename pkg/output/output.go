@@ -124,8 +124,8 @@ func GenerateTSPVisualization(problem *tsp.TSPProblem, tour []int, outputPath st
 			r = 6.0
 		}
 		svgContent += fmt.Sprintf(`  <circle cx="%.2f" cy="%.2f" r="%.1f" class="%s"/>`+"\n", x, y, r, class)
-		svgContent += fmt.Sprintf(`  <text x="%.2f" y="%.2f" text-anchor="middle" dy="%.1f" class="label">%d</text>`+"\n",
-			x, y-8, 0, cityIdx)
+		svgContent += fmt.Sprintf(`  <text x="%.2f" y="%.2f" text-anchor="middle" class="label">%d</text>`+"\n",
+			x, y-10, cityIdx)
 	}
 
 	svgContent += "</svg>\n"

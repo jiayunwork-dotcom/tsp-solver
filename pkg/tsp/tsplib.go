@@ -31,6 +31,7 @@ func LoadTSPLIB(filePath string) (*TSPProblem, error) {
 	nodeCoordSection := false
 	edgeWeightSection := false
 	displayDataSection := false
+	edgeWeightRowIdx := 0
 
 	scanner := bufio.NewScanner(file)
 	lineNum := 0
@@ -113,14 +114,13 @@ func LoadTSPLIB(filePath string) (*TSPProblem, error) {
 		if edgeWeightSection {
 			parts := strings.Fields(line)
 			if spec.EdgeWeightFormat == "FULL_MATRIX" {
-				rowIdx := 0
 				for i, v := range parts {
 					val, _ := strconv.ParseFloat(v, 64)
-					if rowIdx < spec.Dimension && i < spec.Dimension {
-						distanceMatrix[rowIdx][i] = val
+					if edgeWeightRowIdx < spec.Dimension && i < spec.Dimension {
+						distanceMatrix[edgeWeightRowIdx][i] = val
 					}
 				}
-				rowIdx++
+				edgeWeightRowIdx++
 			} else if spec.EdgeWeightFormat == "LOWER_DIAG_ROW" {
 			}
 		}

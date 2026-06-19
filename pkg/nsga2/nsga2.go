@@ -7,7 +7,6 @@ import (
 	"github.com/tsp-solver/pkg/ga/crossover"
 	"github.com/tsp-solver/pkg/ga/encoding"
 	"github.com/tsp-solver/pkg/ga/mutation"
-	"github.com/tsp-solver/pkg/ga/selection"
 	"github.com/tsp-solver/pkg/utils"
 )
 
@@ -322,18 +321,142 @@ func (nsga *NSGA2) calculateHV() float64 {
 		return 0
 	}
 
-	refPoint := make([]float64, nsga.Config.NumObjectives)
-	for i := range refPoint {
-		refPoint[i] = 0
-		for _, ind := range paretoFront {
-			if ind.Objectives[i] > refPoint[i] {
-				refPoint[i] = ind.Objectives[i]
-			}
-		}
-		refPoint[i] *= 1.1
+	numObj := nsga.Config.NumObjectives
+	if numObj <= 0 {
+		return 0
 	}
 
-	return float64(len(paretoFront))
+	refPoint := make([]float64, numObj)
+	for i := range refPoint {
+		maxVal := paretoFront[0].Objectives[i]
+		for _, ind := range paretoFront {
+			if ind.Objectives[i] > maxVal {
+				maxVal = ind.Objectives[i]
+			}
+		}
+		minVal := paretoFront[0].Objectives[i]
+		for _, ind := range paretoFront {
+			if ind.Objectives[i] < minVal {
+				minVal = ind.Objectives[i]
+			}
+		}
+		range_ := maxVal - minVal
+		if range_ < 1e-10 {
+			range_ = 1.0
+		}
+		refPoint[i] = maxVal + range_*0.1
+	}
+
+	points := make([][]float64, len(paretoFront))
+	for i, ind := range paretoFront {
+		points[i] = make([]float64, numObj)
+		copy(points[i], ind.Objectives)
+	}
+
+	if numObj == 2 {
+		return calculateHV2D(points, refPoint)
+	}
+
+	return calculateHVMonteCarlo(points, refPoint, 100000)
+}
+
+func calculateHV2D(points [][]float64, refPoint []float64) float64 {
+	if len(points) == 0 {
+		return 0
+	}
+
+	normalized := make([][]float64, len(points))
+	for i, p := range points {
+		normalized[i] = []float64{
+			refPoint[0] - p[0],
+			refPoint[1] - p[1],
+		}
+		if normalized[i][0] < 0 {
+			normalized[i][0] = 0
+		}
+		if normalized[i][1] < 0 {
+			normalized[i][1] = 0
+		}
+	}
+
+	sort.Slice(normalized, func(i, j int) bool {
+		return normalized[i][0] < normalized[j][0]
+	})
+
+	hv := 0.0
+	prevY := 0.0
+	for i := 0; i < len(normalized); i++ {
+		width := normalized[i][0]
+		if i > 0 {
+			width = normalized[i][0] - normalized[i-1][0]
+		}
+		height := normalized[i][1]
+		if height > prevY {
+			prevY = height
+		}
+		hv += width * prevY
+	}
+
+	return hv
+}
+
+func calculateHVMonteCarlo(points [][]float64, refPoint []float64, samples int) float64 {
+	if len(points) == 0 || samples <= 0 {
+		return 0
+	}
+
+	numObj := len(refPoint)
+
+	minVals := make([]float64, numObj)
+	for i := range minVals {
+		minVals[i] = points[0][i]
+		for _, p := range points {
+			if p[i] < minVals[i] {
+				minVals[i] = p[i]
+			}
+		}
+	}
+
+	totalVolume := 1.0
+	rangeVals := make([]float64, numObj)
+	for i := range refPoint {
+		rangeVals[i] = refPoint[i] - minVals[i]
+		if rangeVals[i] <= 0 {
+			rangeVals[i] = 1.0
+		}
+		totalVolume *= rangeVals[i]
+	}
+
+	count := 0
+	randSource := utils.GetRand()
+
+	for s := 0; s < samples; s++ {
+		sample := make([]float64, numObj)
+		for i := range sample {
+			sample[i] = minVals[i] + randSource.Float64()*rangeVals[i]
+		}
+
+		dominated := false
+		for _, p := range points {
+			dominatesAll := true
+			for i := range p {
+				if p[i] > sample[i] {
+					dominatesAll = false
+					break
+				}
+			}
+			if dominatesAll {
+				dominated = true
+				break
+			}
+		}
+
+		if dominated {
+			count++
+		}
+	}
+
+	return totalVolume * float64(count) / float64(samples)
 }
 
 func (nsga *NSGA2) Run() *NSGA2Result {
