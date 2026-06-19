@@ -55,8 +55,20 @@ func (s *TSPTWSolver) Solve() *TSPTWResult {
 
 		if s.Config.PenaltyType == "adaptive" && s.Gen > 0 &&
 			s.Gen%s.Penalty.PenaltyAdjustInterval == 0 {
+			oldCoeff := s.Penalty.GetCoefficient()
 			ratio := ComputeFeasibleRatio(s.Problem, s.Population)
 			s.Penalty.Adjust(ratio)
+			newCoeff := s.Penalty.GetCoefficient()
+			if s.Config.Verbose {
+				direction := "unchanged"
+				if newCoeff > oldCoeff+1e-10 {
+					direction = "increased"
+				} else if newCoeff < oldCoeff-1e-10 {
+					direction = "decreased"
+				}
+				fmt.Printf("Gen %d: Penalty adjustment [adaptive] | feasible_ratio=%.4f (target=%.4f) | coeff %.2f -> %.2f (%s)\n",
+					s.Gen, ratio, s.Penalty.FeasibilityTarget, oldCoeff, newCoeff, direction)
+			}
 			s.recomputeAllFitness()
 		}
 
@@ -67,20 +79,27 @@ func (s *TSPTWSolver) Solve() *TSPTWResult {
 			RepairTopK(s.Problem, popCopy, s.Config.RepairTopK)
 			s.Population = popCopy
 			s.recomputeAllFitness()
+			if s.Config.Verbose {
+				ratio := ComputeFeasibleRatio(s.Problem, s.Population)
+				fmt.Printf("Gen %d: Repair applied (top-%d), feasible_ratio=%.4f\n",
+					s.Gen, s.Config.RepairTopK, ratio)
+			}
 		}
 
 		if s.Config.Verbose && s.Gen%50 == 0 {
 			eval := s.Problem.EvaluateTour(s.BestTour)
-			fmt.Printf("Gen %d: cost=%.2f dist=%.2f violation=%.2f penalty_coeff=%.2f\n",
-				s.Gen, s.BestCost, eval.TotalDistance, eval.TotalViolation, s.Penalty.GetCoefficient())
+			fmt.Printf("Gen %d: cost=%.2f dist=%.2f wait=%.2f violation=%.2f penalty_coeff=%.2f feasible=%.4f\n",
+				s.Gen, s.BestCost, eval.TotalDistance, eval.TotalWaitTime, eval.TotalViolation,
+				s.Penalty.GetCoefficient(), ComputeFeasibleRatio(s.Problem, s.Population))
 		}
 	}
 
 	eval := s.Problem.EvaluateTour(s.BestTour)
+	bestTourNormalized := ensureDepotFirst(s.BestTour)
 	feasibleRatio := ComputeFeasibleRatio(s.Problem, s.Population)
 
 	return &TSPTWResult{
-		BestTour:      s.BestTour,
+		BestTour:      bestTourNormalized,
 		BestCost:      s.BestCost,
 		BestEval:      eval,
 		Duration:      time.Since(start),
@@ -145,12 +164,18 @@ func (s *TSPTWSolver) step() {
 			child2 = copyTour(s.Population[p2Idx])
 		}
 
+		child1 = normalizeTour(child1, s.Problem.NumCities)
+		child2 = normalizeTour(child2, s.Problem.NumCities)
+
 		if utils.RandFloat() < s.Config.MutationRate {
 			child1 = swapMutate(child1)
 		}
 		if utils.RandFloat() < s.Config.MutationRate {
 			child2 = insertMutate(child2)
 		}
+
+		child1 = normalizeTour(child1, s.Problem.NumCities)
+		child2 = normalizeTour(child2, s.Problem.NumCities)
 
 		offspring = append(offspring, child1)
 		offspringFits = append(offspringFits, s.Problem.ComputePenalizedFitness(child1, s.Penalty.GetCoefficient()))
@@ -193,7 +218,7 @@ func (s *TSPTWSolver) updateBest() {
 
 	cost := s.Problem.ComputePenalizedCost(s.Population[bestIdx], s.Penalty.GetCoefficient())
 	if s.BestTour == nil || cost < s.BestCost {
-		s.BestTour = copyTour(s.Population[bestIdx])
+		s.BestTour = ensureDepotFirst(s.Population[bestIdx])
 		s.BestCost = cost
 	}
 }

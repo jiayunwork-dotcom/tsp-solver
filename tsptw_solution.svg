@@ -14,32 +14,32 @@
   </style>
 
   <text x="400" y="30" text-anchor="middle" class="title">TSPTW Path: data/tsptw_10cities.txt</text>
-  <text x="400" y="50" text-anchor="middle" class="info">Cities: 10 | Distance: 38.80 | Wait: 32.61 | Violation: 0.00</text>
+  <text x="400" y="50" text-anchor="middle" class="info">Cities: 10 | Distance: 44.94 | Wait: 30.87 | Violation: 0.00</text>
   <circle cx="30" cy="570" r="6" class="depot"/>
   <text x="42" y="574" class="legend-text">Depot</text>
   <circle cx="100" cy="570" r="5" class="city-ok"/>
   <text x="112" y="574" class="legend-text">On time</text>
   <circle cx="175" cy="570" r="5" class="city-violated"/>
   <text x="187" y="574" class="legend-text">Violated</text>
-  <path d="M 431.25 487.50 L 243.75 362.50 L 181.25 237.50 L 118.75 550.00 L 493.75 425.00 L 556.25 300.00 L 368.75 112.50 L 306.25 50.00 L 618.75 50.00 L 681.25 175.00 L 431.25 487.50 Z" class="path"/>
-  <circle cx="431.25" cy="487.50" r="7.0" class="depot"/>
+  <path d="M 118.75 550.00 L 431.25 487.50 L 243.75 362.50 L 556.25 300.00 L 493.75 425.00 L 181.25 237.50 L 368.75 112.50 L 306.25 50.00 L 618.75 50.00 L 681.25 175.00 L 118.75 550.00 Z" class="path"/>
+  <circle cx="118.75" cy="550.00" r="7.0" class="depot"/>
+  <text x="118.75" y="538.00" text-anchor="middle" class="label">0</text>
+  <text x="118.75" y="564.00" text-anchor="middle" class="tw-label">[0,1000]</text>
+  <circle cx="431.25" cy="487.50" r="5.0" class="city-ok"/>
   <text x="431.25" y="475.50" text-anchor="middle" class="label">2</text>
   <text x="431.25" y="501.50" text-anchor="middle" class="tw-label">[30,80]</text>
   <circle cx="243.75" cy="362.50" r="5.0" class="city-ok"/>
   <text x="243.75" y="350.50" text-anchor="middle" class="label">1</text>
   <text x="243.75" y="376.50" text-anchor="middle" class="tw-label">[10,50]</text>
-  <circle cx="181.25" cy="237.50" r="5.0" class="city-ok"/>
-  <text x="181.25" y="225.50" text-anchor="middle" class="label">5</text>
-  <text x="181.25" y="251.50" text-anchor="middle" class="tw-label">[40,100]</text>
-  <circle cx="118.75" cy="550.00" r="5.0" class="city-ok"/>
-  <text x="118.75" y="538.00" text-anchor="middle" class="label">0</text>
-  <text x="118.75" y="564.00" text-anchor="middle" class="tw-label">[0,1000]</text>
-  <circle cx="493.75" cy="425.00" r="5.0" class="city-ok"/>
-  <text x="493.75" y="413.00" text-anchor="middle" class="label">7</text>
-  <text x="493.75" y="439.00" text-anchor="middle" class="tw-label">[60,140]</text>
   <circle cx="556.25" cy="300.00" r="5.0" class="city-ok"/>
   <text x="556.25" y="288.00" text-anchor="middle" class="label">3</text>
   <text x="556.25" y="314.00" text-anchor="middle" class="tw-label">[50,120]</text>
+  <circle cx="493.75" cy="425.00" r="5.0" class="city-ok"/>
+  <text x="493.75" y="413.00" text-anchor="middle" class="label">7</text>
+  <text x="493.75" y="439.00" text-anchor="middle" class="tw-label">[60,140]</text>
+  <circle cx="181.25" cy="237.50" r="5.0" class="city-ok"/>
+  <text x="181.25" y="225.50" text-anchor="middle" class="label">5</text>
+  <text x="181.25" y="251.50" text-anchor="middle" class="tw-label">[40,100]</text>
   <circle cx="368.75" cy="112.50" r="5.0" class="city-ok"/>
   <text x="368.75" y="100.50" text-anchor="middle" class="label">4</text>
   <text x="368.75" y="126.50" text-anchor="middle" class="tw-label">[80,160]</text>

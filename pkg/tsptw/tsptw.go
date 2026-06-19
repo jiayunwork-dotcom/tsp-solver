@@ -139,8 +139,11 @@ func (p *TSPTWProblem) EvaluateTour(tour []int) *TourEvaluation {
 		return &TourEvaluation{}
 	}
 
+	n := p.NumCities
+	orderedTour := normalizeTour(tour, n)
+
 	eval := &TourEvaluation{
-		Visits: make([]VisitInfo, len(tour)),
+		Visits: make([]VisitInfo, len(orderedTour)),
 	}
 
 	totalDistance := 0.0
@@ -148,12 +151,12 @@ func (p *TSPTWProblem) EvaluateTour(tour []int) *TourEvaluation {
 	totalWait := 0.0
 	totalViolation := 0.0
 
-	for i, cityIdx := range tour {
+	for i, cityIdx := range orderedTour {
 		var arrivalTime float64
 		if i == 0 {
 			arrivalTime = 0.0
 		} else {
-			prevCity := tour[i-1]
+			prevCity := orderedTour[i-1]
 			travelTime := p.TravelTime(prevCity, cityIdx)
 			travelDist := p.Distance(prevCity, cityIdx)
 			totalDistance += travelDist
@@ -161,6 +164,7 @@ func (p *TSPTWProblem) EvaluateTour(tour []int) *TourEvaluation {
 		}
 
 		city := p.Cities[cityIdx]
+		rawArrival := arrivalTime
 		var waitTime float64
 		if arrivalTime < city.Earliest {
 			waitTime = city.Earliest - arrivalTime
@@ -180,7 +184,7 @@ func (p *TSPTWProblem) EvaluateTour(tour []int) *TourEvaluation {
 
 		eval.Visits[i] = VisitInfo{
 			CityID:       cityIdx,
-			ArrivalTime:  arrivalTime - waitTime,
+			ArrivalTime:  rawArrival,
 			WaitTime:     waitTime,
 			ServiceStart: serviceStart,
 			ServiceEnd:   serviceEnd,
@@ -190,8 +194,8 @@ func (p *TSPTWProblem) EvaluateTour(tour []int) *TourEvaluation {
 		currentTime = serviceEnd
 	}
 
-	lastCity := tour[len(tour)-1]
-	firstCity := tour[0]
+	lastCity := orderedTour[len(orderedTour)-1]
+	firstCity := orderedTour[0]
 	returnDist := p.Distance(lastCity, firstCity)
 	totalDistance += returnDist
 
@@ -274,7 +278,7 @@ func RepairIndividual(problem *TSPTWProblem, tour []int) []int {
 			break
 		}
 
-		for i := 0; i < len(result)-1; i++ {
+		for i := 1; i < len(result)-1; i++ {
 			newTour := make([]int, len(result))
 			copy(newTour, result)
 			newTour[i], newTour[i+1] = newTour[i+1], newTour[i]
@@ -367,28 +371,41 @@ func oxCrossover(parent1, parent2 []int) ([]int, []int) {
 		return copyTour(parent1), copyTour(parent2)
 	}
 
-	start := utils.RandInt(0, n-2)
-	end := utils.RandInt(start+1, n-1)
-
 	child1 := make([]int, n)
 	child2 := make([]int, n)
+	child1[0] = 0
+	child2[0] = 0
+
+	m := n - 1
+	if m <= 2 {
+		copy(child1[1:], parent1[1:])
+		copy(child2[1:], parent2[1:])
+		return child1, child2
+	}
+
+	start := utils.RandInt(0, m-2) + 1
+	end := utils.RandInt(start, n-1)
+
+	p1Sub := parent1[start : end+1]
+	p2Sub := parent2[start : end+1]
+
 	for i := range child1 {
 		child1[i] = -1
 		child2[i] = -1
 	}
+	child1[0] = 0
+	child2[0] = 0
 
-	for i := start; i <= end; i++ {
-		child1[i] = parent1[i]
-		child2[i] = parent2[i]
-	}
+	copy(child1[start:end+1], p1Sub)
+	copy(child2[start:end+1], p2Sub)
 
-	fillOX(child1, parent2, end, n)
-	fillOX(child2, parent1, end, n)
+	fillOXFrom(child1, parent2, start, end, n)
+	fillOXFrom(child2, parent1, start, end, n)
 
 	return child1, child2
 }
 
-func fillOX(child []int, parent []int, end int, n int) {
+func fillOXFrom(child []int, parent []int, start, end, n int) {
 	used := make(map[int]bool)
 	for _, v := range child {
 		if v != -1 {
@@ -396,30 +413,37 @@ func fillOX(child []int, parent []int, end int, n int) {
 		}
 	}
 
-	pos := (end + 1) % n
-	parentPos := (end + 1) % n
-
-	for count := 0; count < n; count++ {
-		val := parent[parentPos]
-		if !used[val] {
-			child[pos] = val
-			used[val] = true
-			pos = (pos + 1) % n
+	pos := 1
+	parentPos := 0
+	for pos < n {
+		if child[pos] != -1 {
+			pos++
+			continue
 		}
-		parentPos = (parentPos + 1) % n
+		if parentPos >= n {
+			parentPos = 0
+		}
+		val := parent[parentPos]
+		parentPos++
+		if val == 0 || used[val] {
+			continue
+		}
+		child[pos] = val
+		used[val] = true
+		pos++
 	}
 }
 
 func swapMutate(tour []int) []int {
 	result := copyTour(tour)
 	n := len(result)
-	if n < 2 {
+	if n < 3 {
 		return result
 	}
-	i := utils.RandInt(0, n-1)
-	j := utils.RandInt(0, n-1)
+	i := utils.RandInt(1, n-1)
+	j := utils.RandInt(1, n-1)
 	for j == i {
-		j = utils.RandInt(0, n-1)
+		j = utils.RandInt(1, n-1)
 	}
 	result[i], result[j] = result[j], result[i]
 	return result
@@ -428,13 +452,13 @@ func swapMutate(tour []int) []int {
 func insertMutate(tour []int) []int {
 	result := copyTour(tour)
 	n := len(result)
-	if n < 3 {
+	if n < 4 {
 		return result
 	}
-	i := utils.RandInt(0, n-1)
-	j := utils.RandInt(0, n-1)
+	i := utils.RandInt(1, n-1)
+	j := utils.RandInt(1, n-1)
 	for j == i {
-		j = utils.RandInt(0, n-1)
+		j = utils.RandInt(1, n-1)
 	}
 
 	val := result[i]
@@ -455,10 +479,87 @@ func copyTour(tour []int) []int {
 }
 
 func randomTour(n int) []int {
-	tour := make([]int, n)
-	for i := range tour {
-		tour[i] = i
+	if n <= 1 {
+		tour := make([]int, n)
+		for i := range tour {
+			tour[i] = i
+		}
+		return tour
 	}
-	utils.Shuffle(tour)
+	tour := make([]int, n)
+	tour[0] = 0
+	rest := make([]int, n-1)
+	for i := 1; i < n; i++ {
+		rest[i-1] = i
+	}
+	utils.Shuffle(rest)
+	copy(tour[1:], rest)
 	return tour
+}
+
+func ensureDepotFirst(tour []int) []int {
+	if len(tour) == 0 {
+		return tour
+	}
+	if tour[0] == 0 {
+		return tour
+	}
+	result := make([]int, len(tour))
+	depotIdx := -1
+	for i, v := range tour {
+		if v == 0 {
+			depotIdx = i
+			break
+		}
+	}
+	if depotIdx == -1 {
+		result[0] = 0
+		idx := 1
+		for _, v := range tour {
+			if v != 0 {
+				result[idx] = v
+				idx++
+			}
+		}
+		return result
+	}
+	copy(result, tour[depotIdx:])
+	copy(result[len(tour)-depotIdx:], tour[:depotIdx])
+	return result
+}
+
+func normalizeTour(tour []int, n int) []int {
+	result := make([]int, n)
+	for i := range result {
+		result[i] = -1
+	}
+	result[0] = 0
+
+	used := make(map[int]bool)
+	used[0] = true
+
+	pos := 1
+	for _, v := range tour {
+		if v < 0 || v >= n {
+			continue
+		}
+		if used[v] {
+			continue
+		}
+		if pos >= n {
+			break
+		}
+		result[pos] = v
+		used[v] = true
+		pos++
+	}
+
+	for v := 1; v < n && pos < n; v++ {
+		if !used[v] {
+			result[pos] = v
+			pos++
+		}
+	}
+
+	return result
 }
